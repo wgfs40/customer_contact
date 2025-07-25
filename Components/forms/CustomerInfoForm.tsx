@@ -23,11 +23,11 @@ const CustomerInfoForm = ({ className }: CustomerInfoFormProps) => {
         name: formData.get("name") as string,
         email: formData.get("email") as string,
       };
-      
+
       await SaveCustomerInfo(customerData);
       setMessage("Customer information saved successfully!");
       // Reset form
-      event.currentTarget.reset();
+      //event.currentTarget.reset();
     } catch (error) {
       console.error("Error saving customer information:", error);
       setMessage("Error saving customer information. Please try again.");

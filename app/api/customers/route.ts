@@ -1,25 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { createClient } from "@supabase/supabase-js";
 
-// Debug environment variables
-console.log("DB Configuration:", {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? process.env.DB_PORT : "NOT SET",
-  user: process.env.DB_USER,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD ? "***" : "NOT SET",
-});
-
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const supabaseUrl = process.env.Project_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+if (!supabaseKey) {
+  throw new Error("SUPABASE_KEY environment variable is not set");
+}
 
 // POST - Save customer information
 export async function POST(request: NextRequest) {
@@ -33,17 +19,21 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Test connection first
-    const connection = await pool.getConnection();
-    console.log("Database connection established successfully");
-
-    await connection.query(
-      "INSERT INTO customers (name, email) VALUES (?, ?)",
-      [name, email]
+    const SupabaseClient = createClient(
+      supabaseUrl as string,
+      supabaseKey as string
     );
-    connection.release();
-    console.log("Customer data inserted successfully:", { name, email });
+
+    console.log("Database connection established successfully");
+    const { data, error } = await SupabaseClient.from("Customers")
+      .insert([{ names: name, email }])
+      .select();
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("Customer data inserted successfully:", { name, email, data });
 
     return NextResponse.json(
       { message: "Customer information saved successfully" },
@@ -80,9 +70,17 @@ export async function POST(request: NextRequest) {
 // GET - Retrieve customer information
 export async function GET() {
   try {
-    const connection = await pool.getConnection();
-    const [rows] = await connection.query("SELECT * FROM customers");
-    connection.release();
+    const SupabaseClient = createClient(
+      supabaseUrl as string,
+      supabaseKey as string
+    );
+    const { data: rows, error } = await SupabaseClient.from("Customers").select(
+      "*"
+    );
+
+    if (error) {
+      throw error;
+    }
 
     return NextResponse.json(rows, { status: 200 });
   } catch (error) {

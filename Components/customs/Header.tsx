@@ -11,14 +11,14 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
   // Function to handle menu toggle
 
   return (
-    <header className="flex items-center justify-between p-4 bg-orange-500 text-black shadow-lg">
+    <header className="flex items-center justify-between p-4 bg-orange-400 text-black shadow-lg">
       <div className="flex items-center space-x-2">
-        <div className="bg-white rounded-full p-2 shadow-md">
+        <div className="bg-white  p-2 shadow-md">
           <Image
             src="/images/logo_sin_fondo.png"
             alt="Logo"
-            width={80}
-            height={80}
+            width={40}
+            height={40}
             className="object-contain"
           />
         </div>

@@ -1,88 +1,197 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
+
   return (
-    <main className="text-gray-800">
-      <section className="text-center py-16 bg-orange-100">
-        <Image
-          src="/images/logo_sin_fondo.png"
-          alt="Dosis de Marketing"
-          className="mx-auto w-40 mb-6"
-          width={160}
-          height={160}
-        />
-        <h1 className="text-4xl font-bold mb-4">
-          Tu dosis diaria de estrategias de marketing
-        </h1>
-        <p className="mb-6">
-          Aprende, aplica y crece con contenido práctico y actualizado.
-        </p>
-        <Link
-          href="/contact"
-          className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600"
-        >
-          Suscríbete Gratis
-        </Link>
-      </section>
-
-      <section className="py-12 px-4 bg-white">
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          ¿Qué obtienes con cada dosis?
-        </h2>
-        <ul className="max-w-xl mx-auto space-y-4 text-lg">
-          <li>📈 Estrategias de marketing digital listas para aplicar</li>
-          <li>🧪 Casos reales y análisis de campañas exitosas</li>
-          <li>🎯 Tips rápidos y efectivos para redes sociales</li>
-        </ul>
-      </section>
-
-      <section className="py-12 px-4 bg-orange-50">
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          Lo que dicen nuestros suscriptores
-        </h2>
-        <div className="max-w-2xl mx-auto space-y-4 text-center">
-          <blockquote>
-            “Gracias a Dosis de Marketing, mis campañas ahora tienen el doble de
-            impacto.” – Ana M.
-          </blockquote>
-          <blockquote>
-            “Contenido claro, útil y directo al grano. ¡Lo recomiendo!” – Carlos
-            R.
-          </blockquote>
+    <div className="min-h-screen bg-[#F9E4B7] text-white">
+      <header className="flex items-center justify-between p-4 bg-gradient-to-r from-[#F9A825] via-[#FFF8E1] to-[#F9E4B7] text-black shadow-lg">
+        <div className="flex items-center space-x-2">
+          <div className="bg-white rounded-full p-2 shadow-md">
+            <Image
+              src="/images/logo_sin_fondo.png"
+              alt="Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </div>
+          <span className="hidden md:inline font-serif font-extrabold text-2xl text-[#D7263D] drop-shadow">
+            Dosis de Marketing
+          </span>
         </div>
-      </section>
 
-      {/* <section id="suscribete" className="py-12 px-4 bg-white">
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          Recibe tu dosis semanal
-        </h2>
-        <form className="max-w-md mx-auto flex flex-col items-center space-y-4">
-          <input
-            type="email"
-            placeholder="Tu correo electrónico"
-            required
-            className="border px-4 py-2 w-full rounded"
-          />
+        {/* Responsive navigation: hamburger menu on mobile */}
+        <nav className="relative">
+          {/* Hamburger button (visible on mobile) */}
           <button
-            type="submit"
-            className="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600"
+            className="md:hidden flex items-center px-2 py-1 border rounded text-black hover:text-[#F9A825] focus:outline-none"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="Abrir menú"
           >
-            Suscribirme
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
           </button>
-        </form>
-      </section> */}
-
-      <footer className="py-6 text-center bg-orange-100 text-sm">
-        <p>&copy; 2025 Dosis de Marketing. Todos los derechos reservados.</p>
-        <nav className="space-x-2">
-          <a href="#" className="underline">
-            Política de privacidad
-          </a>
-          <a href="#" className="underline">
-            Contacto
-          </a>
+          {/* Menu links */}
+          <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap">
+            <Link
+              href="#"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Inicio
+            </Link>
+            <Link
+              href="#"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Servicios
+            </Link>
+            <Link
+              href="#"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Galería
+            </Link>
+            <Link
+              href="/contact"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Contacto
+            </Link>
+            <Link
+              href="#"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Blog
+            </Link>
+            <Link
+              href="#"
+              className="hover:text-[#F9A825] transition-colors px-2 py-1"
+            >
+              Sobre Mi
+            </Link>
+          </div>
+          {/* Mobile menu dropdown */}
+          {menuOpen && (
+            <div
+              className="fixed inset-0 bg-opacity-40 z-20 md:hidden"
+              onClick={() => setMenuOpen(false)}
+            >
+              <div
+                className="absolute top-16 left-4 right-4 bg-white shadow-md rounded flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Link
+                  href="#"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Inicio
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Servicios
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Galería
+                </Link>
+                <Link
+                  href="/contact"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Contacto
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="#"
+                  className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sobre Mi
+                </Link>
+              </div>
+            </div>
+          )}
         </nav>
+      </header>
+
+      <main className="flex flex-col md:flex-row items-center justify-between p-8">
+        <div className="max-w-xl">
+          <h1
+            className="text-4xl font-bold mb-4 text-black"
+            style={{
+              fontFamily:
+                "'Montserrat', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Descubre cómo Dosis de Marketing puede impulsar tu negocio y
+            ayudarte a alcanzar tus metas. ¡Aprovecha el poder del marketing
+            digital para destacar y crecer en el mundo actual!
+          </h1>
+          <p className="mb-6 text-lg text-gray-700">
+            Conoce nuestras estrategias efectivas y personalizadas para llevar
+            tu marca al siguiente nivel.
+          </p>
+          <div className="space-x-4">
+            <button className="bg-accent text-black px-4 py-2 rounded">
+              Comprar
+            </button>
+            <button
+              className="bg-orange-500 text-primary px-4 py-2 rounded"
+              onClick={() => router.push("/contact")}
+            >
+              Contacto
+            </button>
+          </div>
+        </div>
+        <div className="mt-8 md:mt-0 flex space-x-4">
+          <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white">
+            <Image
+              src="/reference.jpg"
+              alt="Mascotas"
+              width={160}
+              height={160}
+            />
+            prueba
+          </div>
+        </div>
+      </main>
+
+      <footer className="text-center p-4 bg-white text-black">
+        © 2025 Dosis de Marketing. Todos los derechos reservados.
       </footer>
-    </main>
+    </div>
   );
 }

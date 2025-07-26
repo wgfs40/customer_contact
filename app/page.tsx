@@ -10,8 +10,8 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#F9E4B7] text-white">
-      <header className="flex items-center justify-between p-4 bg-gradient-to-r from-[#F9A825] via-[#FFF8E1] to-[#F9E4B7] text-black shadow-lg">
+    <div className="min-h-screen bg-white text-black">
+      <header className="flex items-center justify-between p-4 bg-orange-500 text-black shadow-lg">
         <div className="flex items-center space-x-2">
           <div className="bg-white rounded-full p-2 shadow-md">
             <Image
@@ -22,7 +22,7 @@ export default function Home() {
               className="object-contain"
             />
           </div>
-          <span className="hidden md:inline font-serif font-extrabold text-2xl text-[#D7263D] drop-shadow">
+          <span className="hidden md:inline font-serif font-extrabold text-2xl text-[#e6e5e5] drop-shadow">
             Dosis de Marketing
           </span>
         </div>
@@ -169,7 +169,7 @@ export default function Home() {
               Comprar
             </button>
             <button
-              className="bg-orange-500 text-primary px-4 py-2 rounded"
+              className="bg-orange-500 text-primary px-4 py-2 rounded text-white hover:bg-orange-600 transition-colors"
               onClick={() => router.push("/contact")}
             >
               Contacto

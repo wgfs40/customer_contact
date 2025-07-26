@@ -4,10 +4,12 @@ import Image from "next/image";
 import CustomInput from "../customs/CustomInput";
 import { useState, useEffect } from "react";
 import { SaveCustomerInfo } from "@/actions/customer_info";
+import { useRouter } from "next/navigation";
 
 const KitForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,7 +25,7 @@ const KitForm = () => {
 
       await SaveCustomerInfo(customerData);
       setMessage("Información del cliente guardada con éxito!");
-      // Reset form
+      router.push("/");
       //event.currentTarget.reset();
     } catch (error) {
       console.error("Error saving customer information:", error);

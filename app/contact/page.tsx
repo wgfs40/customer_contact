@@ -1,3 +1,4 @@
+"use client";
 import KitForm from "@/Components/forms/KitForm";
 
 const ContactPage = () => {

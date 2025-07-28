@@ -18,15 +18,13 @@ export default function Home() {
               letterSpacing: "0.02em",
             }}
           >
-            Descubre cómo Dosis de Marketing puede impulsar tu negocio y
-            ayudarte a alcanzar tus metas. ¡Aprovecha el poder del marketing
-            digital para destacar y crecer en el mundo actual!
+            Impulsa tu negocio con Dosis de Marketing
           </h1>
           <p className="mb-6 text-lg text-gray-700">
-            Conoce nuestras estrategias efectivas y personalizadas para llevar
-            tu marca al siguiente nivel.
+            H1: Impulsa tu negocio con Dosis de Marketing H2: Destácate y crece
+            usando estrategias digitales efectivas.
           </p>
-          <div className="space-x-4">           
+          <div className="space-x-4">
             <button
               className="bg-orange-500 text-primary px-4 py-2 rounded text-white hover:bg-orange-600 transition-colors"
               onClick={() => router.push("/home/contact")}

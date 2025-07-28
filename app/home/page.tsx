@@ -26,10 +26,7 @@ export default function Home() {
             Conoce nuestras estrategias efectivas y personalizadas para llevar
             tu marca al siguiente nivel.
           </p>
-          <div className="space-x-4">
-            <button className="bg-accent text-black px-4 py-2 rounded">
-              Comprar
-            </button>
+          <div className="space-x-4">           
             <button
               className="bg-orange-500 text-primary px-4 py-2 rounded text-white hover:bg-orange-600 transition-colors"
               onClick={() => router.push("/home/contact")}

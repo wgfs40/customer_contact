@@ -8,8 +8,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      {/* Hero section */}
+      <Hero />
       <div className="container mx-auto px-4">
-        <Hero />
         {/* Main content */}
         {children}
       </div>

@@ -9,7 +9,6 @@ interface HeaderProps {
 
 const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
   // Function to handle menu toggle
-
   return (
     <header className="flex items-center justify-between p-4 bg-orange-400 text-black shadow-lg">
       <div className="flex items-center space-x-2">
@@ -50,39 +49,39 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           </svg>
         </button>
         {/* Menu links */}
-        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap">
+        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap text-white">
           <Link
-            href="/home"
+            href="/"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Inicio
           </Link>
           <Link
-            href="/home/services"
+            href="/services"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Servicios
           </Link>
           <Link
-            href="/home/gallery"
+            href="/gallery"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Galería
           </Link>
           <Link
-            href="/home/contact"
+            href="/contact"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Contacto
           </Link>
           <Link
-            href="/home/blog"
+            href="/blog"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Blog
           </Link>
           <Link
-            href="/home/about"
+            href="/about"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
             Sobre Mi
@@ -99,21 +98,21 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
               onClick={(e) => e.stopPropagation()}
             >
               <Link
-                href="/home"
+                href="/"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >
                 Inicio
               </Link>
               <Link
-                href="/home/services"
+                href="/services"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >
                 Servicios
               </Link>
               <Link
-                href="/home/gallery"
+                href="/gallery"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >
@@ -127,21 +126,21 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
                 Contacto
               </Link>
               <Link
-                href="/home/blog"
+                href="/blog"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >
                 Blog
               </Link>
               <Link
-                href="/home/blog"
+                href="/blog"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >
                 Blog
               </Link>
               <Link
-                href="/home/about"
+                href="/about"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
               >

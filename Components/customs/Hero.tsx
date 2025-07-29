@@ -1,6 +1,6 @@
 "use client";
 
-import ImageCarousel from "@/components/customs/ImageCarousel";
+import ImageCarousel from "@/Components/customs/ImageCarousel";
 
 const Hero = () => {
   return (

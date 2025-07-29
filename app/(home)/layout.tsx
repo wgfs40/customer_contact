@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Header from "@/components/customs/Header";
+import Header from "@/Components/customs/Header";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [menuOpen, setMenuOpen] = useState(false);

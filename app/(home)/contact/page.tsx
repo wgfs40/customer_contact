@@ -1,5 +1,5 @@
 "use client";
-import KitForm from "@/components/forms/KitForm";
+import KitForm from "@/Components/forms/KitForm";
 
 const ContactPage = () => {
   return (

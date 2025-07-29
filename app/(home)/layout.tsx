@@ -10,6 +10,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {/* Hero section */}
       <Hero />
+      {/* Main content area */}
       <div className="container mx-auto px-4">
         {/* Main content */}
         {children}

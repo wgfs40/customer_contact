@@ -10,20 +10,17 @@ interface HeaderProps {
 const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
   // Function to handle menu toggle
   return (
-    <header className="flex items-center justify-between p-4 bg-orange-400 text-black shadow-lg">
+    <header className="fixed top-0 left-0 w-full flex items-center justify-between p-4 bg-white text-black shadow-lg z-30">
       <div className="flex items-center space-x-2">
-        <div className="bg-white  p-2 shadow-md">
+        <div className="bg-white  p-2 ">
           <Image
             src="/images/logo_sin_fondo.png"
             alt="Logo"
-            width={40}
-            height={40}
+            width={80}
+            height={80}
             className="object-contain"
           />
         </div>
-        <span className="hidden md:inline font-serif font-extrabold text-2xl text-[#e6e5e5] drop-shadow">
-          Dosis de Marketing
-        </span>
       </div>
 
       {/* Responsive navigation: hamburger menu on mobile */}
@@ -49,7 +46,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           </svg>
         </button>
         {/* Menu links */}
-        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap text-white">
+        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap text-black">
           <Link
             href="/"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
@@ -94,7 +91,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             onClick={() => setMenuOpen(false)}
           >
             <div
-              className="absolute top-16 left-4 right-4 bg-white shadow-md rounded flex flex-col"
+              className="absolute top-16 left-4 right-4 bg-black shadow-md rounded flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <Link

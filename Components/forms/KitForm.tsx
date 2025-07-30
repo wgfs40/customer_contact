@@ -62,13 +62,13 @@ const KitForm = () => {
           name="name"
           type="text"
           placeholder="Introduce tu nombre completo"
-          className="w-full px-4 py-2 border bg-white border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full px-4 py-2 border bg-white text-black border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
         />
         <CustomInput
           name="email"
           type="email"
           placeholder="Introduce tu correo electrónico"
-          className="w-full px-4 py-2 border bg-white border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full px-4 py-2 border bg-white text-black border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
         />
 
         <button

@@ -133,13 +133,6 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
                 Blog
               </Link>
               <Link
-                href="/blog"
-                className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
-                onClick={() => setMenuOpen(false)}
-              >
-                Blog
-              </Link>
-              <Link
                 href="/about"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}

@@ -91,7 +91,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             onClick={() => setMenuOpen(false)}
           >
             <div
-              className="absolute top-16 left-4 right-4 bg-black shadow-md rounded flex flex-col"
+              className="absolute top-16 left-4 right-4 bg-white shadow-md rounded flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <Link

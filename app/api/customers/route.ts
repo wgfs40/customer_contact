@@ -222,14 +222,26 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    return NextResponse.json(rows, {
-      status: 200,
-      headers: {
-        "X-RateLimit-Limit": RATE_LIMIT.toString(),
-        "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-        "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
-      },
-    });
+    // Transform the data to match the expected format
+    const customers =
+      rows?.map((row: any) => ({
+        id: row.id,
+        name: row.names,
+        email: row.email,
+        created_at: row.created_at,
+      })) || [];
+
+    return NextResponse.json(
+      { customers },
+      {
+        status: 200,
+        headers: {
+          "X-RateLimit-Limit": RATE_LIMIT.toString(),
+          "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+          "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
+        },
+      }
+    );
   } catch (error) {
     console.error("Database error:", error);
 

@@ -1,0 +1,46 @@
+{
+  "testConfig": {
+    "server": {
+      "host": "localhost",
+      "port": 3001,
+      "protocol": "http"
+    },
+    "api": {
+      "baseUrl": "http://localhost:3001/api",
+      "timeout": 10000,
+      "retries": 3
+    },
+    "rateLimiting": {
+      "maxRequests": 10,
+      "windowMs": 60000,
+      "testRequests": 12
+    },
+    "database": {
+      "testData": {
+        "customers": [
+          {
+            "name": "Test User 1",
+            "email": "test1@example.com"
+          },
+          {
+            "name": "Test User 2",
+            "email": "test2@example.com"
+          }
+        ]
+      }
+    },
+    "auth": {
+      "testUsers": {
+        "validUser": {
+          "email": "test@example.com",
+          "password": "TestPassword123!"
+        }
+      }
+    },
+    "logging": {
+      "level": "info",
+      "showTimestamps": true,
+      "colors": true
+    }
+  }
+}

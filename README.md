@@ -20,6 +20,42 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## 🧪 Testing
+
+The project includes a comprehensive testing suite organized in the `tests/` directory.
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test categories
+npm run test:security
+npm run test:rate-limit
+```
+
+### Test Structure
+
+```
+tests/
+├── README.md              # Test documentation
+├── config.json           # Test configuration
+├── run-all-tests.js      # Test runner
+├── api/                  # API tests
+├── components/           # Component tests
+└── security/             # Security tests
+    └── rate-limit-node.test.js
+```
+
+### Available Tests
+
+- **Rate Limiting**: Verifies API protection against spam (10 requests/minute)
+- **Security**: Authentication and authorization tests
+- **API**: Endpoint functionality tests
+
+For detailed testing documentation, see [tests/README.md](tests/README.md).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

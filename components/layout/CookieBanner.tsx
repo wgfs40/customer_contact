@@ -2,8 +2,13 @@
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 
 const CookieBanner = () => {
-  const { isVisible, acceptCookies, rejectCookies } = useCookieConsent();
+  const { isVisible, acceptCookies, rejectCookies, isMounted } =
+    useCookieConsent();
 
+  // Don't render anything until component is mounted on client
+  if (!isMounted) return null;
+
+  // Don't show banner if user has already made a choice
   if (!isVisible) return null;
 
   return (

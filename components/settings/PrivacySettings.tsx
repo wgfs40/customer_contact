@@ -2,8 +2,25 @@
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 
 const PrivacySettings = () => {
-  const { consentValue, acceptCookies, rejectCookies, resetConsent } =
-    useCookieConsent();
+  const {
+    consentValue,
+    acceptCookies,
+    rejectCookies,
+    resetConsent,
+    isMounted,
+  } = useCookieConsent();
+
+  // Don't render until component is mounted on client to prevent hydration errors
+  if (!isMounted) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-semibold mb-4">
+          Configuración de Privacidad
+        </h3>
+        <p className="text-gray-500">Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">

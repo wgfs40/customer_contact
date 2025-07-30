@@ -14,9 +14,23 @@ export async function SaveCustomerInfo(customerData: {
 
     const data = await response.json();
 
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = response.headers.get("Retry-After");
+      const errorMessage =
+        data.message ||
+        `Demasiadas solicitudes. Intenta nuevamente en ${retryAfter} segundos.`;
+      throw new Error(errorMessage);
+    }
+
     if (!response.ok) {
       throw new Error(data.error || "Failed to save customer information");
     }
+
+    // Log rate limit info for debugging (opcional)
+    const remaining = response.headers.get("X-RateLimit-Remaining");
+    const limit = response.headers.get("X-RateLimit-Limit");
+    console.log(`Rate limit: ${remaining}/${limit} requests remaining`);
 
     return data;
   } catch (error) {
@@ -37,9 +51,23 @@ export async function GetCustomerInfo() {
 
     const data = await response.json();
 
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = response.headers.get("Retry-After");
+      const errorMessage =
+        data.message ||
+        `Demasiadas solicitudes. Intenta nuevamente en ${retryAfter} segundos.`;
+      throw new Error(errorMessage);
+    }
+
     if (!response.ok) {
       throw new Error(data.error || "Failed to retrieve customer information");
     }
+
+    // Log rate limit info for debugging (opcional)
+    const remaining = response.headers.get("X-RateLimit-Remaining");
+    const limit = response.headers.get("X-RateLimit-Limit");
+    console.log(`Rate limit: ${remaining}/${limit} requests remaining`);
 
     return data;
   } catch (error) {

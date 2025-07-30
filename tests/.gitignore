@@ -1,0 +1,14 @@
+# Test artifacts
+*.log
+*.tmp
+test-results/
+coverage/
+*.test.bak
+
+# Test data
+test-data/
+*.test.json
+
+# OS generated files
+.DS_Store
+Thumbs.db

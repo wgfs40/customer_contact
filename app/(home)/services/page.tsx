@@ -1,11 +1,10 @@
 "use client";
-import NewsletterSignupForm from "@/components/forms/NewsletterSignupForm";
-import Image from "next/image";
+import NewsletterForm from "../../../components/forms/NewsletterForm";
 
 const ServicePage = () => {
   return (
     <div className="min-h-screenflex items-center justify-center px-4">
-      <NewsletterSignupForm />
+      <NewsletterForm />
     </div>
   );
 };

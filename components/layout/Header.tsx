@@ -1,4 +1,11 @@
 "use client";
+
+import {
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -46,7 +53,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           </svg>
         </button>
         {/* Menu links */}
-        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap text-black">
+        <div className="hidden md:flex space-x-2 md:space-x-4 flex-wrap md:flex-nowrap items-center text-black font-sans">
           <Link
             href="/"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
@@ -83,6 +90,19 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           >
             Sobre Mi
           </Link>
+          <SignedOut>
+            <SignInButton>
+              <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
+                Iniciar Sesión
+              </button>
+            </SignInButton>
+            <SignUpButton>
+              <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
+                Registrarse
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <UserButton />
         </div>
         {/* Mobile menu dropdown */}
         {menuOpen && (
@@ -136,6 +156,19 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
               >
                 Sobre Mi
               </Link>
+              <SignedOut>
+                <SignInButton>
+                  <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
+                    Iniciar Sesión
+                  </button>
+                </SignInButton>
+                <SignUpButton>
+                  <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
+                    Registrarse
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+              <UserButton />
             </div>
           </div>
         )}

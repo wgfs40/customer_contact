@@ -26,7 +26,7 @@ const ServicePage = () => {
       </div>
       <div className="flex justify-center items-center mt-8">
         <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSebLfSvaS0KRTeHkRRgmGsEOzmaQ0wpzCeMEm24j2Hj5UQt9w/viewform?pli=1"
+          href="https://forms.gle/Y9daUs2p5N8PJhgm8"
           target="_blank"
           rel="noopener noreferrer"
           className="bg-orange-500 text-white px-6 py-3 rounded-md font-semibold hover:bg-orange-600 transition"

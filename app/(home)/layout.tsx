@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CookieBanner from "@/components/layout/CookieBanner";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,7 +11,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Header */}
       <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {/* Main content area */}
-      <main className="flex-1 container mx-auto px-4 mt-50">{children}</main>
+      <main className="flex-1 container mx-auto px-4 mt-50">
+        <CookieBanner />
+        {children}
+      </main>
       {/* Footer section */}
       <Footer />
     </div>

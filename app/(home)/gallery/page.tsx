@@ -1,6 +1,6 @@
 "use client";
 
-import ConstructionPage from "@/Components/customs/ConstructionPage";
+import ConstructionPage from "@/components/customs/ConstructionPage";
 
 const GalleryPage = () => {
   return (

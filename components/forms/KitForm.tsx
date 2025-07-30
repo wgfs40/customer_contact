@@ -23,6 +23,7 @@ const KitForm = () => {
         email: formData.get("email") as string,
       };
 
+      console.log("Submitting customer data:", customerData);
       await SaveCustomerInfo(customerData);
       setMessage("Información del cliente guardada con éxito!");
       router.push("/");

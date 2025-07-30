@@ -1,6 +1,14 @@
 "use client";
+
+import ConstructionPage from "@/Components/customs/ConstructionPage";
+
 const AboutPage = () => {
-  return <div>AboutPage</div>;
+  return (
+    <div>
+      {" "}
+      <ConstructionPage />
+    </div>
+  );
 };
 
 export default AboutPage;

@@ -1,7 +1,14 @@
 "use client";
 
+import ConstructionPage from "@/Components/customs/ConstructionPage";
+
 const ServicePage = () => {
-  return <div>ServicePage</div>;
+  return (
+    <div>
+      {" "}
+      <ConstructionPage />
+    </div>
+  );
 };
 
 export default ServicePage;

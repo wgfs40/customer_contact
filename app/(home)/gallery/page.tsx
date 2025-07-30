@@ -1,6 +1,13 @@
 "use client";
+
+import ConstructionPage from "@/Components/customs/ConstructionPage";
+
 const GalleryPage = () => {
-  return <div>GalleryPage</div>;
+  return (
+    <>
+      <ConstructionPage />
+    </>
+  );
 };
 
 export default GalleryPage;

@@ -1,7 +1,14 @@
 "use client";
 
+import ConstructionPage from "@/Components/customs/ConstructionPage";
+
 const BlogPage = () => {
-  return <div>BlogPage</div>;
+  return (
+    <div>
+      {" "}
+      <ConstructionPage />
+    </div>
+  );
 };
 
 export default BlogPage;

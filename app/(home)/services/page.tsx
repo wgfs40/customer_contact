@@ -3,7 +3,7 @@
 const ServicePage = () => {
   return (
     <div>
-      <div className="flex justify-center mt-8">
+      <div className="flex flex-col items-center justify-center mt-8">
         <svg
           width="80"
           height="80"
@@ -19,6 +19,10 @@ const ServicePage = () => {
           />
           <rect x="36" y="36" width="8" height="8" rx="2" fill="#FFF7ED" />
         </svg>
+        <p className="text-center text-lg text-gray-700 mb-2">
+          Recibe inspiración y estrategias de marketing directo en tu correo.
+          Suscríbete a mi newsletter.
+        </p>
       </div>
       <div className="flex justify-center items-center mt-8">
         <a

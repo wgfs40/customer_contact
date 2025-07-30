@@ -1,6 +1,6 @@
 "use client";
 
-import Hero from "@/components/customs/Hero";
+import Hero from "@/components/layout/Hero";
 
 const page = () => {
   return (

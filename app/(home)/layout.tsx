@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,13 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Main content area */}
       <main className="flex-1 container mx-auto px-4 mt-50">{children}</main>
       {/* Footer section */}
-      <footer className="bg-gray-800 text-white py-4">
-        <div className="container mx-auto px-4">
-          <p className="text-center">
-            © 2023 Dosis de Marketing. Todos los derechos reservados.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

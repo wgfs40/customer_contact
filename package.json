@@ -14,7 +14,8 @@
     "test:api": "jest tests/api/",
     "test:components": "jest tests/components/",
     "test:runner": "node tests/run-all-tests.js",
-    "test:rate-limit": "node tests/security/rate-limit-node.test.js"
+    "test:rate-limit": "node tests/security/rate-limit-node.test.js",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.28.0",
@@ -31,6 +32,7 @@
     "lucide-react": "^0.533.0",
     "mysql2": "^3.14.2",
     "next": "15.4.2",
+    "next-sitemap": "^4.2.3",
     "node-fetch": "^3.3.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",

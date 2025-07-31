@@ -62,6 +62,12 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             Inicio
           </Link>
           <Link
+            href="/about"
+            className="hover:text-[#F9A825] transition-colors px-2 py-1"
+          >
+            Sobre mí
+          </Link>
+          <Link
             href="/services"
             className="hover:text-[#F9A825] transition-colors px-2 py-1"
           >
@@ -85,12 +91,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           >
             Blog
           </Link>
-          <Link
-            href="/about"
-            className="hover:text-[#F9A825] transition-colors px-2 py-1"
-          >
-            Sobre Mi
-          </Link>
+
           <SignedIn>
             <Link
               href="/customer"
@@ -131,6 +132,13 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
                 Inicio
               </Link>
               <Link
+                href="/about"
+                className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sobre mí
+              </Link>
+              <Link
                 href="/services"
                 className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
                 onClick={() => setMenuOpen(false)}
@@ -158,13 +166,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
               >
                 Blog
               </Link>
-              <Link
-                href="/about"
-                className="hover:text-[#F9A825] transition-colors px-4 py-2 text-black"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sobre Mi
-              </Link>
+
               <SignedIn>
                 <Link
                   href="/customer"

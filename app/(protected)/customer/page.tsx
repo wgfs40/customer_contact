@@ -1,47 +1,60 @@
 "use client";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Swal from "sweetalert2";
 import CustomerInfoForm from "@/components/forms/CustomerInfoForm";
-
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  created_at: string;
-}
+import {
+  GetCustomersWithPagination,
+  PaginationParams,
+  PaginatedResponse,
+  Customer,
+} from "@/actions/customer_info";
 
 const CustomerPage = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [paginatedData, setPaginatedData] =
+    useState<PaginatedResponse<Customer> | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Estados para paginación
+  // Estados para paginación del servidor
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Número de clientes por página
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "created_at" | "id">(
+    "created_at"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Calcular datos para paginación
-  const totalItems = customers.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCustomers = customers.slice(startIndex, endIndex);
+  // Debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Resetear a la primera página cuando se busque
+    }, 300);
 
-  // Funciones de paginación
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Funciones de paginación del servidor
   const goToPage = (page: number) => {
     setCurrentPage(page);
   };
 
   const goToPreviousPage = () => {
-    setCurrentPage((prev: number) => Math.max(prev - 1, 1));
+    if (paginatedData?.pagination.hasPrevPage) {
+      setCurrentPage((prev: number) => prev - 1);
+    }
   };
 
   const goToNextPage = () => {
-    setCurrentPage((prev: number) => Math.min(prev + 1, totalPages));
+    if (paginatedData?.pagination.hasNextPage) {
+      setCurrentPage((prev: number) => prev + 1);
+    }
   };
 
   // Resetear página cuando se actualiza la lista
@@ -50,18 +63,20 @@ const CustomerPage = () => {
     setRefreshKey((prev: number) => prev + 1);
   };
 
-  // Función para cargar clientes
-  const loadCustomers = async () => {
+  // Función para cargar clientes con paginación del servidor
+  const loadCustomers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/customers");
+      const params: PaginationParams = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: debouncedSearchTerm,
+        sortBy,
+        sortOrder,
+      };
 
-      if (response.ok) {
-        const data = await response.json();
-        setCustomers(data.customers || []);
-      } else {
-        throw new Error("Error al cargar clientes");
-      }
+      const response = await GetCustomersWithPagination(params);
+      setPaginatedData(response);
     } catch (err) {
       console.error("Error loading customers:", err);
       Swal.fire({
@@ -73,7 +88,7 @@ const CustomerPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, debouncedSearchTerm, sortBy, sortOrder]);
 
   // Función para agregar cliente
   const handleAddCustomer = async () => {
@@ -271,12 +286,12 @@ const CustomerPage = () => {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  // Cargar clientes cuando el componente se monte y cuando cambie refreshKey
+  // Cargar clientes cuando el componente se monte y cuando cambien los parámetros de paginación
   useEffect(() => {
     if (isSignedIn && isLoaded) {
       loadCustomers();
     }
-  }, [isSignedIn, isLoaded, refreshKey]);
+  }, [isSignedIn, isLoaded, refreshKey, loadCustomers]);
 
   // Mostrar loading mientras se verifica la autenticación
   if (!isLoaded) {
@@ -313,18 +328,33 @@ const CustomerPage = () => {
                 <h2 className="text-xl font-semibold text-gray-800">
                   Gestión de Clientes
                 </h2>
-                {customers.length > 0 && (
+                {paginatedData && paginatedData.pagination.totalItems > 0 && (
                   <p className="text-sm text-gray-600 mt-1">
-                    {totalItems} cliente{totalItems !== 1 ? "s" : ""} registrado
-                    {totalItems !== 1 ? "s" : ""}
-                    {totalPages > 1 &&
-                      ` • Página ${currentPage} de ${totalPages}`}
+                    {paginatedData.pagination.totalItems} cliente
+                    {paginatedData.pagination.totalItems !== 1 ? "s" : ""}{" "}
+                    registrado
+                    {paginatedData.pagination.totalItems !== 1 ? "s" : ""}
+                    {paginatedData.pagination.totalPages > 1 &&
+                      ` • Página ${paginatedData.pagination.currentPage} de ${paginatedData.pagination.totalPages}`}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-4">
+                {/* Barra de búsqueda */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Buscar clientes..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                    }}
+                    className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-64"
+                  />
+                </div>
+
                 {/* Selector de elementos por página */}
-                {customers.length > 10 && (
+                {paginatedData && paginatedData.pagination.totalItems > 10 && (
                   <div className="flex items-center gap-2">
                     <label
                       htmlFor="itemsPerPage"
@@ -345,6 +375,7 @@ const CustomerPage = () => {
                       <option value={10}>10</option>
                       <option value={25}>25</option>
                       <option value={50}>50</option>
+                      <option value={100}>100</option>
                     </select>
                     <span className="text-sm text-gray-600">por página</span>
                   </div>
@@ -381,7 +412,7 @@ const CustomerPage = () => {
                     Cargando clientes...
                   </span>
                 </div>
-              ) : customers.length === 0 ? (
+              ) : !paginatedData || paginatedData.data.length === 0 ? (
                 <div className="text-center py-12">
                   <svg
                     className="w-16 h-16 text-gray-400 mx-auto mb-4"
@@ -397,17 +428,23 @@ const CustomerPage = () => {
                     />
                   </svg>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No hay clientes registrados
+                    {debouncedSearchTerm
+                      ? "No se encontraron clientes"
+                      : "No hay clientes registrados"}
                   </h3>
                   <p className="text-gray-500 mb-4">
-                    Comienza agregando tu primer cliente
+                    {debouncedSearchTerm
+                      ? `No hay resultados para "${debouncedSearchTerm}"`
+                      : "Comienza agregando tu primer cliente"}
                   </p>
-                  <button
-                    onClick={handleAddCustomer}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-                  >
-                    Agregar Cliente
-                  </button>
+                  {!debouncedSearchTerm && (
+                    <button
+                      onClick={handleAddCustomer}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Agregar Cliente
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -415,16 +452,84 @@ const CustomerPage = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          ID
+                          <button
+                            onClick={() => {
+                              setSortBy("id");
+                              setSortOrder(
+                                sortBy === "id" && sortOrder === "asc"
+                                  ? "desc"
+                                  : "asc"
+                              );
+                            }}
+                            className="flex items-center gap-1 hover:text-gray-700"
+                          >
+                            ID
+                            {sortBy === "id" && (
+                              <span className="text-orange-500">
+                                {sortOrder === "asc" ? "↑" : "↓"}
+                              </span>
+                            )}
+                          </button>
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Nombre
+                          <button
+                            onClick={() => {
+                              setSortBy("name");
+                              setSortOrder(
+                                sortBy === "name" && sortOrder === "asc"
+                                  ? "desc"
+                                  : "asc"
+                              );
+                            }}
+                            className="flex items-center gap-1 hover:text-gray-700"
+                          >
+                            Nombre
+                            {sortBy === "name" && (
+                              <span className="text-orange-500">
+                                {sortOrder === "asc" ? "↑" : "↓"}
+                              </span>
+                            )}
+                          </button>
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
+                          <button
+                            onClick={() => {
+                              setSortBy("email");
+                              setSortOrder(
+                                sortBy === "email" && sortOrder === "asc"
+                                  ? "desc"
+                                  : "asc"
+                              );
+                            }}
+                            className="flex items-center gap-1 hover:text-gray-700"
+                          >
+                            Email
+                            {sortBy === "email" && (
+                              <span className="text-orange-500">
+                                {sortOrder === "asc" ? "↑" : "↓"}
+                              </span>
+                            )}
+                          </button>
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Fecha de Registro
+                          <button
+                            onClick={() => {
+                              setSortBy("created_at");
+                              setSortOrder(
+                                sortBy === "created_at" && sortOrder === "asc"
+                                  ? "desc"
+                                  : "asc"
+                              );
+                            }}
+                            className="flex items-center gap-1 hover:text-gray-700"
+                          >
+                            Fecha de Registro
+                            {sortBy === "created_at" && (
+                              <span className="text-orange-500">
+                                {sortOrder === "asc" ? "↑" : "↓"}
+                              </span>
+                            )}
+                          </button>
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Acciones
@@ -432,14 +537,12 @@ const CustomerPage = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {currentCustomers.map(
+                      {paginatedData.data.map(
                         (customer: Customer, index: number) => (
                           <tr
                             key={customer.id}
                             className={
-                              (startIndex + index) % 2 === 0
-                                ? "bg-white"
-                                : "bg-gray-50"
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50"
                             }
                           >
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -531,85 +634,111 @@ const CustomerPage = () => {
               )}
             </div>
             {/* Componente de Paginación */}
-            {customers.length > 0 && totalPages > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  {/* Paginación móvil */}
-                  <button
-                    onClick={goToPreviousPage}
-                    disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                      currentPage === 1
-                        ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                        : "text-gray-700 bg-white hover:bg-gray-50"
-                    }`}
-                  >
-                    Anterior
-                  </button>
-                  <button
-                    onClick={goToNextPage}
-                    disabled={currentPage === totalPages}
-                    className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                      currentPage === totalPages
-                        ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                        : "text-gray-700 bg-white hover:bg-gray-50"
-                    }`}
-                  >
-                    Siguiente
-                  </button>
-                </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Mostrando{" "}
-                      <span className="font-medium">{startIndex + 1}</span> -{" "}
-                      <span className="font-medium">
-                        {Math.min(endIndex, totalItems)}
-                      </span>{" "}
-                      de <span className="font-medium">{totalItems}</span>{" "}
-                      clientes
-                    </p>
-                  </div>
-                  <div>
-                    <nav
-                      className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                      aria-label="Pagination"
+            {paginatedData &&
+              paginatedData.pagination.totalItems > 0 &&
+              paginatedData.pagination.totalPages > 1 && (
+                <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    {/* Paginación móvil */}
+                    <button
+                      onClick={goToPreviousPage}
+                      disabled={!paginatedData.pagination.hasPrevPage}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        !paginatedData.pagination.hasPrevPage
+                          ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                          : "text-gray-700 bg-white hover:bg-gray-50"
+                      }`}
                     >
-                      {/* Botón Anterior */}
-                      <button
-                        onClick={goToPreviousPage}
-                        disabled={currentPage === 1}
-                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
-                          currentPage === 1
-                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                            : "text-gray-500 bg-white hover:bg-gray-50"
-                        }`}
+                      Anterior
+                    </button>
+                    <button
+                      onClick={goToNextPage}
+                      disabled={!paginatedData.pagination.hasNextPage}
+                      className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        !paginatedData.pagination.hasNextPage
+                          ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                          : "text-gray-700 bg-white hover:bg-gray-50"
+                      }`}
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Mostrando{" "}
+                        <span className="font-medium">
+                          {(paginatedData.pagination.currentPage - 1) *
+                            paginatedData.pagination.itemsPerPage +
+                            1}
+                        </span>{" "}
+                        -{" "}
+                        <span className="font-medium">
+                          {Math.min(
+                            paginatedData.pagination.currentPage *
+                              paginatedData.pagination.itemsPerPage,
+                            paginatedData.pagination.totalItems
+                          )}
+                        </span>{" "}
+                        de{" "}
+                        <span className="font-medium">
+                          {paginatedData.pagination.totalItems}
+                        </span>{" "}
+                        clientes
+                        {debouncedSearchTerm && (
+                          <span className="text-gray-500">
+                            {" "}
+                            (filtrados por &ldquo;{debouncedSearchTerm}&rdquo;)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <nav
+                        className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                        aria-label="Pagination"
                       >
-                        <span className="sr-only">Anterior</span>
-                        <svg
-                          className="h-5 w-5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+                        {/* Botón Anterior */}
+                        <button
+                          onClick={goToPreviousPage}
+                          disabled={!paginatedData.pagination.hasPrevPage}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
+                            !paginatedData.pagination.hasPrevPage
+                              ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                              : "text-gray-500 bg-white hover:bg-gray-50"
+                          }`}
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                          <span className="sr-only">Anterior</span>
+                          <svg
+                            className="h-5 w-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
 
-                      {/* Números de página */}
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (page) => {
-                          const isCurrentPage = page === currentPage;
+                        {/* Números de página */}
+                        {Array.from(
+                          { length: paginatedData.pagination.totalPages },
+                          (_, i) => i + 1
+                        ).map((page) => {
+                          const isCurrentPage =
+                            page === paginatedData.pagination.currentPage;
                           const isNearCurrentPage =
-                            Math.abs(page - currentPage) <= 2;
+                            Math.abs(
+                              page - paginatedData.pagination.currentPage
+                            ) <= 2;
                           const isFirstOrLast =
-                            page === 1 || page === totalPages;
+                            page === 1 ||
+                            page === paginatedData.pagination.totalPages;
 
                           if (
-                            totalPages <= 7 ||
+                            paginatedData.pagination.totalPages <= 7 ||
                             isNearCurrentPage ||
                             isFirstOrLast
                           ) {
@@ -629,8 +758,8 @@ const CustomerPage = () => {
                           }
 
                           if (
-                            page === currentPage - 3 ||
-                            page === currentPage + 3
+                            page === paginatedData.pagination.currentPage - 3 ||
+                            page === paginatedData.pagination.currentPage + 3
                           ) {
                             return (
                               <span
@@ -643,37 +772,36 @@ const CustomerPage = () => {
                           }
 
                           return null;
-                        }
-                      )}
+                        })}
 
-                      {/* Botón Siguiente */}
-                      <button
-                        onClick={goToNextPage}
-                        disabled={currentPage === totalPages}
-                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
-                          currentPage === totalPages
-                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
-                            : "text-gray-500 bg-white hover:bg-gray-50"
-                        }`}
-                      >
-                        <span className="sr-only">Siguiente</span>
-                        <svg
-                          className="h-5 w-5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+                        {/* Botón Siguiente */}
+                        <button
+                          onClick={goToNextPage}
+                          disabled={!paginatedData.pagination.hasNextPage}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
+                            !paginatedData.pagination.hasNextPage
+                              ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                              : "text-gray-500 bg-white hover:bg-gray-50"
+                          }`}
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </nav>
+                          <span className="sr-only">Siguiente</span>
+                          <svg
+                            className="h-5 w-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </nav>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -738,7 +866,10 @@ const CustomerPage = () => {
                   <p>Última actualización: {new Date().toLocaleDateString()}</p>
                   <p>Estado: Activo</p>
                   <p>Versión: 1.0.0</p>
-                  <p>Total de clientes: {customers.length}</p>
+                  <p>
+                    Total de clientes:{" "}
+                    {paginatedData?.pagination.totalItems || 0}
+                  </p>
                 </div>
                 <div className="mt-4 space-y-2">
                   <button

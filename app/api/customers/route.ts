@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET - Retrieve customer information
+// GET - Retrieve customer information with pagination
 export async function GET(request: NextRequest) {
   try {
     // Check rate limit
@@ -218,13 +218,47 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Extract pagination and search parameters
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || "";
+    const sortBy = searchParams.get("sortBy") || "created_at";
+    const sortOrder = searchParams.get("sortOrder") || "desc";
+
+    // Validate pagination parameters
+    const validatedPage = Math.max(1, page);
+    const validatedLimit = Math.min(Math.max(1, limit), 100); // Max 100 items per page
+    const offset = (validatedPage - 1) * validatedLimit;
+
     const SupabaseClient = createClient(
       supabaseUrl as string,
       supabaseKey as string
     );
-    const { data: rows, error } = await SupabaseClient.from("Customers").select(
-      "*"
-    );
+
+    // Build the query
+    let query = SupabaseClient.from("Customers").select("*", {
+      count: "exact",
+    });
+
+    // Add search filter if provided
+    if (search) {
+      query = query.or(`names.ilike.%${search}%,email.ilike.%${search}%`);
+    }
+
+    // Add sorting
+    const validSortColumns = ["id", "names", "email", "created_at"];
+    const sortColumn = validSortColumns.includes(sortBy)
+      ? sortBy
+      : "created_at";
+    const sortDirection = sortOrder === "asc" ? false : true; // true for descending
+
+    query = query.order(sortColumn, { ascending: !sortDirection });
+
+    // Add pagination
+    query = query.range(offset, offset + validatedLimit - 1);
+
+    const { data: rows, error, count } = await query;
 
     if (error) {
       throw error;
@@ -239,17 +273,47 @@ export async function GET(request: NextRequest) {
         created_at: row.created_at,
       })) || [];
 
-    return NextResponse.json(
-      { customers },
-      {
-        status: 200,
-        headers: {
-          "X-RateLimit-Limit": RATE_LIMIT.toString(),
-          "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-          "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
-        },
-      }
-    );
+    // Calculate pagination metadata
+    const totalItems = count || 0;
+    const totalPages = Math.ceil(totalItems / validatedLimit);
+    const hasNextPage = validatedPage < totalPages;
+    const hasPrevPage = validatedPage > 1;
+
+    const response = {
+      data: customers,
+      pagination: {
+        currentPage: validatedPage,
+        totalPages,
+        totalItems,
+        itemsPerPage: validatedLimit,
+        hasNextPage,
+        hasPrevPage,
+      },
+    };
+
+    // For backward compatibility, if no pagination params provided, return old format
+    if (!searchParams.has("page") && !searchParams.has("limit")) {
+      return NextResponse.json(
+        { customers },
+        {
+          status: 200,
+          headers: {
+            "X-RateLimit-Limit": RATE_LIMIT.toString(),
+            "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+            "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
+          },
+        }
+      );
+    }
+
+    return NextResponse.json(response, {
+      status: 200,
+      headers: {
+        "X-RateLimit-Limit": RATE_LIMIT.toString(),
+        "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+        "X-RateLimit-Reset": rateLimitResult.resetTime.toString(),
+      },
+    });
   } catch (error) {
     console.error("Database error:", error);
 

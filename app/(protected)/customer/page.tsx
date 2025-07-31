@@ -20,6 +20,36 @@ const CustomerPage = () => {
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Número de clientes por página
+
+  // Calcular datos para paginación
+  const totalItems = customers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCustomers = customers.slice(startIndex, endIndex);
+
+  // Funciones de paginación
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prev: number) => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prev: number) => Math.min(prev + 1, totalPages));
+  };
+
+  // Resetear página cuando se actualiza la lista
+  const handleRefresh = () => {
+    setCurrentPage(1);
+    setRefreshKey((prev: number) => prev + 1);
+  };
+
   // Función para cargar clientes
   const loadCustomers = async () => {
     try {
@@ -95,7 +125,7 @@ const CustomerPage = () => {
             text: "El cliente se ha agregado exitosamente",
             confirmButtonColor: "#FF8800",
           });
-          setRefreshKey((prev: number) => prev + 1);
+          handleRefresh();
         } else {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al agregar cliente");
@@ -163,7 +193,7 @@ const CustomerPage = () => {
             text: "Los datos del cliente se han actualizado exitosamente",
             confirmButtonColor: "#FF8800",
           });
-          setRefreshKey((prev: number) => prev + 1);
+          handleRefresh();
         } else {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al actualizar cliente");
@@ -207,7 +237,7 @@ const CustomerPage = () => {
             text: "El cliente se ha eliminado exitosamente",
             confirmButtonColor: "#FF8800",
           });
-          setRefreshKey((prev: number) => prev + 1);
+          handleRefresh();
         } else {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al eliminar cliente");
@@ -279,30 +309,69 @@ const CustomerPage = () => {
           {/* Sección de Gestión de Clientes */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Gestión de Clientes
-              </h2>
-              <button
-                onClick={handleAddCustomer}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                Agregar Cliente
-              </button>
-            </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Gestión de Clientes
+                </h2>
+                {customers.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {totalItems} cliente{totalItems !== 1 ? "s" : ""} registrado
+                    {totalItems !== 1 ? "s" : ""}
+                    {totalPages > 1 &&
+                      ` • Página ${currentPage} de ${totalPages}`}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                {/* Selector de elementos por página */}
+                {customers.length > 10 && (
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="itemsPerPage"
+                      className="text-sm text-gray-600"
+                    >
+                      Mostrar:
+                    </label>
+                    <select
+                      id="itemsPerPage"
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                    </select>
+                    <span className="text-sm text-gray-600">por página</span>
+                  </div>
+                )}
 
+                {/* Botón Agregar Cliente */}
+                <button
+                  onClick={handleAddCustomer}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Agregar Cliente
+                </button>
+              </div>
+            </div>{" "}
             {/* Tabla de Clientes */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
               {loading ? (
@@ -363,100 +432,248 @@ const CustomerPage = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {customers.map((customer: Customer, index: number) => (
-                        <tr
-                          key={customer.id}
-                          className={
-                            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          }
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            #{customer.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                  <span className="text-orange-600 font-medium text-sm">
-                                    {customer.name.charAt(0).toUpperCase()}
-                                  </span>
+                      {currentCustomers.map(
+                        (customer: Customer, index: number) => (
+                          <tr
+                            key={customer.id}
+                            className={
+                              (startIndex + index) % 2 === 0
+                                ? "bg-white"
+                                : "bg-gray-50"
+                            }
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              #{customer.id}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10">
+                                  <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                    <span className="text-orange-600 font-medium text-sm">
+                                      {customer.name.charAt(0).toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {customer.name}
+                                  </div>
                                 </div>
                               </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {customer.name}
-                                </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {customer.email}
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
-                              {customer.email}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(customer.created_at).toLocaleDateString(
-                              "es-ES",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <div className="flex justify-center space-x-2">
-                              <button
-                                onClick={() => handleEditCustomer(customer)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors flex items-center gap-1"
-                                title="Editar cliente"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(customer.created_at).toLocaleDateString(
+                                "es-ES",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                              <div className="flex justify-center space-x-2">
+                                <button
+                                  onClick={() => handleEditCustomer(customer)}
+                                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors flex items-center gap-1"
+                                  title="Editar cliente"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                                Editar
-                              </button>
-                              <button
-                                onClick={() => handleDeleteCustomer(customer)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors flex items-center gap-1"
-                                title="Eliminar cliente"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCustomer(customer)}
+                                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors flex items-center gap-1"
+                                  title="Eliminar cliente"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                                Eliminar
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
               )}
             </div>
+            {/* Componente de Paginación */}
+            {customers.length > 0 && totalPages > 1 && (
+              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  {/* Paginación móvil */}
+                  <button
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      currentPage === 1
+                        ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                        : "text-gray-700 bg-white hover:bg-gray-50"
+                    }`}
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      currentPage === totalPages
+                        ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                        : "text-gray-700 bg-white hover:bg-gray-50"
+                    }`}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Mostrando{" "}
+                      <span className="font-medium">{startIndex + 1}</span> -{" "}
+                      <span className="font-medium">
+                        {Math.min(endIndex, totalItems)}
+                      </span>{" "}
+                      de <span className="font-medium">{totalItems}</span>{" "}
+                      clientes
+                    </p>
+                  </div>
+                  <div>
+                    <nav
+                      className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                      aria-label="Pagination"
+                    >
+                      {/* Botón Anterior */}
+                      <button
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
+                          currentPage === 1
+                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                            : "text-gray-500 bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className="sr-only">Anterior</span>
+                        <svg
+                          className="h-5 w-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* Números de página */}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => {
+                          const isCurrentPage = page === currentPage;
+                          const isNearCurrentPage =
+                            Math.abs(page - currentPage) <= 2;
+                          const isFirstOrLast =
+                            page === 1 || page === totalPages;
+
+                          if (
+                            totalPages <= 7 ||
+                            isNearCurrentPage ||
+                            isFirstOrLast
+                          ) {
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => goToPage(page)}
+                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                  isCurrentPage
+                                    ? "z-10 bg-orange-50 border-orange-500 text-orange-600"
+                                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          }
+
+                          if (
+                            page === currentPage - 3 ||
+                            page === currentPage + 3
+                          ) {
+                            return (
+                              <span
+                                key={page}
+                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                              >
+                                ...
+                              </span>
+                            );
+                          }
+
+                          return null;
+                        }
+                      )}
+
+                      {/* Botón Siguiente */}
+                      <button
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
+                          currentPage === totalPages
+                            ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                            : "text-gray-500 bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className="sr-only">Siguiente</span>
+                        <svg
+                          className="h-5 w-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -4,6 +4,14 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+  eslint: {
+    // Solo mostrar errores en producción, no warnings
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    // Tipo de verificación durante build
+    ignoreBuildErrors: false,
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

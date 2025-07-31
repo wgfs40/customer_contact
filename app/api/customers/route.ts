@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Types
+interface CustomerRow {
+  id: number;
+  names: string;
+  email: string;
+  created_at: string;
+}
+
 // Rate limiting configuration
 const RATE_LIMIT = 10; // Maximum requests
 const WINDOW_MS = 60 * 1000; // 1 minute window
@@ -224,7 +232,7 @@ export async function GET(request: NextRequest) {
 
     // Transform the data to match the expected format
     const customers =
-      rows?.map((row: any) => ({
+      rows?.map((row: CustomerRow) => ({
         id: row.id,
         name: row.names,
         email: row.email,

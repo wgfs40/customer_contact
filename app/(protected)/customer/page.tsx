@@ -32,7 +32,8 @@ const CustomerPage = () => {
       } else {
         throw new Error("Error al cargar clientes");
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Error loading customers:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -99,11 +100,13 @@ const CustomerPage = () => {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al agregar cliente");
         }
-      } catch (error) {
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error desconocido";
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error instanceof Error ? error.message : "Error desconocido",
+          text: errorMessage,
           confirmButtonColor: "#FF8800",
         });
       }
@@ -165,11 +168,13 @@ const CustomerPage = () => {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al actualizar cliente");
         }
-      } catch (error) {
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error desconocido";
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error instanceof Error ? error.message : "Error desconocido",
+          text: errorMessage,
           confirmButtonColor: "#FF8800",
         });
       }
@@ -207,11 +212,13 @@ const CustomerPage = () => {
           const errorData = await response.json();
           throw new Error(errorData.error || "Error al eliminar cliente");
         }
-      } catch (error) {
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error desconocido";
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error instanceof Error ? error.message : "Error desconocido",
+          text: errorMessage,
           confirmButtonColor: "#FF8800",
         });
       }

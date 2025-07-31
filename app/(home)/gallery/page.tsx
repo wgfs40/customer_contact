@@ -1,11 +1,11 @@
 "use client";
 
-import ConstructionPage from "@/components/layout/ConstructionPage";
+import Gallery from "@/components/Gallery/Gallery";
 
 const GalleryPage = () => {
   return (
     <>
-      <ConstructionPage />
+      <Gallery />
     </>
   );
 };

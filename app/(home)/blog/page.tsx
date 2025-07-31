@@ -1,12 +1,11 @@
 "use client";
 
-import ConstructionPage from "@/components/layout/ConstructionPage";
+import Blog from "@/components/blog/Blog";
 
 const BlogPage = () => {
   return (
     <div>
-      {" "}
-      <ConstructionPage />
+      <Blog />
     </div>
   );
 };

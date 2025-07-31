@@ -1,13 +1,10 @@
 "use client";
 
-// Update the import path if the alias is not configured or the file is elsewhere
-import ConstructionPage from "@/components/layout/ConstructionPage";
-
+import About from "@/components/about/About";
 const AboutPage = () => {
   return (
     <div>
-      {" "}
-      <ConstructionPage />
+      <About />
     </div>
   );
 };

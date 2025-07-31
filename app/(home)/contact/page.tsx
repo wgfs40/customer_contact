@@ -1,13 +1,11 @@
 "use client";
-import KitForm from "@/components/forms/KitForm";
+
+import Contact from "@/components/contact/Contact";
 
 const ContactPage = () => {
   return (
     <div>
-      <main className="flex flex-col gap-[32px] items-center justify-center min-h-screen bg-orange-400">
-        <KitForm />
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
+      <Contact />
     </div>
   );
 };

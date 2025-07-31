@@ -8,7 +8,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  CarouselApi,
+  type CarouselApi,
 } from "../ui/carousel";
 import { Card, CardContent } from "../ui/card";
 

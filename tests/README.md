@@ -129,7 +129,7 @@ module.exports = {
   collectCoverageFrom: [
     "app/**/*.{js,ts,tsx}",
     "actions/**/*.{js,ts,tsx}",
-    "Components/**/*.{js,ts,tsx}",
+    "components/**/*.{js,ts,tsx}",
   ],
   verbose: true,
   testTimeout: 30000,

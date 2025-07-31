@@ -3,7 +3,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import CustomerInfoForm from "@/Components/forms/CustomerInfoForm";
+import CustomerInfoForm from "@/components/forms/CustomerInfoForm";
 
 interface Customer {
   id: number;

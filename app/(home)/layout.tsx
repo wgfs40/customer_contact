@@ -1,10 +1,14 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/layout/CookieBanner";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="flex flex-col min-h-screen">

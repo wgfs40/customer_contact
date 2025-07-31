@@ -5,6 +5,9 @@
  * y configura el entorno de testing global.
  */
 
+// Set environment to test for Babel configuration
+process.env.NODE_ENV = "test";
+
 // Configurar timeouts globales
 jest.setTimeout(30000);
 

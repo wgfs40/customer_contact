@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  SignedIn,
   SignedOut,
   SignInButton,
   SignUpButton,
@@ -90,17 +91,25 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           >
             Sobre Mi
           </Link>
+          <SignedIn>
+            <Link
+              href="/customer"
+              className="bg-[#F9A825] hover:bg-[#FF8F00] text-white font-medium px-4 py-2 rounded-lg transition-colors shadow-md"
+            >
+              Panel de Cliente
+            </Link>
+          </SignedIn>
           <SignedOut>
             <SignInButton>
               <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
                 Iniciar Sesión
               </button>
             </SignInButton>
-            <SignUpButton>
+            {/* <SignUpButton>
               <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">
                 Registrarse
               </button>
-            </SignUpButton>
+            </SignUpButton> */}
           </SignedOut>
           <UserButton />
         </div>
@@ -156,6 +165,15 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
               >
                 Sobre Mi
               </Link>
+              <SignedIn>
+                <Link
+                  href="/customer"
+                  className="bg-[#F9A825] hover:bg-[#FF8F00] text-white font-medium px-4 py-2 mx-4 my-2 rounded-lg transition-colors shadow-md text-center"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Panel de Cliente
+                </Link>
+              </SignedIn>
               <SignedOut>
                 <SignInButton>
                   <button className="hover:text-[#F9A825] transition-colors px-2 py-1 font-sans">

@@ -167,6 +167,9 @@ export default function Page() {
                 <p className="text-sm text-gray-600">
                   Atención directa para todas tus consultas
                 </p>
+                <p className="text-sm text-gray-600">
+                  Respuestas rápidas y efectivas a tus necesidades
+                </p>
               </div>
             </div>
           </div>

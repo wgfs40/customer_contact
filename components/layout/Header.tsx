@@ -88,10 +88,10 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
 
           {/* Brand Name */}
           <div className="ml-3 hidden sm:block">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-[#F9A825] to-[#FF8F00] bg-clip-text text-transparent">
+            <h1 className="font-display font-bold text-2xl text-gradient-brand">
               Dosis de Marketing
             </h1>
-            <p className="font-heading text-sm text-gray-500 font-medium">
+            <p className="font-heading text-sm text-gray-500">
               Marketing Digital
             </p>
           </div>

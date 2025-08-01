@@ -36,11 +36,11 @@ const About = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             {/* Text Content */}
             <div className="lg:w-1/2 text-white">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              <h1 className="font-heading font-bold text-4xl md:text-5xl lg:text-6xl mb-4">
                 Hola, soy{" "}
                 <span className="text-white drop-shadow-lg">Marisol Muñoz</span>
               </h1>
-              <h2 className="text-xl md:text-2xl mb-6 opacity-90 font-light">
+              <h2 className="font-heading font-semibold text-xl md:text-2xl lg:text-3xl text-white/90 mb-8">
                 Experta en Marketing Digital & Estratega de Crecimiento
               </h2>
               <p className="text-lg md:text-xl mb-8 opacity-90 leading-relaxed">
@@ -57,19 +57,20 @@ const About = () => {
                 </button>
               </div>
             </div>
-            {/* Image - Versión alternativa con difuminado más sutil */}
-            <div className="lg:w-1/2 flex justify-center">
-              <div className="relative w-full h-[500px] md:h-[600px] lg:h-[650px]">
-                {/* Background blur effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-2xl blur-3xl scale-110"></div>
 
-                {/* Main image container */}
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl group">
+            {/* Image - Optimizada para móvil con forma redondeada */}
+            <div className="lg:w-1/2 flex justify-center w-full">
+              <div className="relative">
+                {/* Background blur effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-full blur-3xl scale-110"></div>
+
+                {/* Main image container - Totalmente redondeada */}
+                <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] rounded-full overflow-hidden shadow-2xl group">
                   <Image
                     src="/images/marisol.png"
                     alt="Marisol - Experta en Marketing Digital"
                     fill
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "cover", objectPosition: "center top" }}
                     className={`transition-all duration-1000 group-hover:scale-105 ${
                       imageLoaded ? "scale-100 blur-0" : "scale-105 blur-sm"
                     }`}
@@ -78,26 +79,23 @@ const About = () => {
                   />
 
                   {/* Difuminado gradual en la parte inferior */}
-                  <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#F9A825]/70 via-[#F9A825]/30 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 md:h-32 lg:h-40 bg-gradient-to-t from-[#F9A825]/80 via-[#F9A825]/40 to-transparent"></div>
 
                   {/* Efecto de cristal difuminado en la parte inferior */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 backdrop-blur-md bg-gradient-to-t from-black/40 to-transparent"></div>
-
-                  {/* Sombra sutil para profundidad */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 md:h-24 lg:h-32 backdrop-blur-sm bg-gradient-to-t from-black/50 to-transparent"></div>
 
                   {/* Contenido elegante en la parte inferior */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white z-10 text-center">
                     <div className="transform transition-all duration-300 group-hover:translate-y-0 translate-y-2">
-                      <h3 className="text-xl md:text-2xl font-bold mb-1 drop-shadow-lg">
+                      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1 md:mb-2 drop-shadow-lg">
                         Marisol Muñoz
                       </h3>
-                      <p className="text-sm md:text-base opacity-90 drop-shadow-md">
-                        Experta en Marketing Digital & Estratega de Crecimiento
+                      <p className="text-xs sm:text-sm md:text-base lg:text-lg opacity-90 drop-shadow-md mb-2 md:mb-3">
+                        Marketing Digital Expert
                       </p>
-                      <div className="flex items-center mt-3 space-x-4">
-                        <div className="flex items-center text-xs md:text-sm">
-                          <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                      <div className="flex items-center justify-center">
+                        <div className="flex items-center text-xs sm:text-sm md:text-base">
+                          <span className="w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full mr-2 animate-pulse"></span>
                           Disponible para proyectos
                         </div>
                       </div>
@@ -105,12 +103,20 @@ const About = () => {
                   </div>
 
                   {/* Brillo sutil en hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
                 </div>
 
-                {/* Decorative rings actualizados */}
-                <div className="absolute -inset-3 border-2 border-white/40 rounded-2xl animate-pulse"></div>
-                <div className="absolute -inset-5 border border-white/30 rounded-2xl opacity-60"></div>
+                {/* Decorative rings - Adaptados para forma circular */}
+                <div className="absolute inset-0 w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] border-2 border-white/40 rounded-full animate-pulse scale-105"></div>
+                <div className="absolute inset-0 w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] border border-white/30 rounded-full opacity-60 scale-110"></div>
+
+                {/* Elementos decorativos flotantes */}
+                <div className="absolute -top-4 -right-4 w-6 h-6 md:w-8 md:h-8 bg-white/30 rounded-full animate-bounce"></div>
+                <div
+                  className="absolute -bottom-6 -left-6 w-4 h-4 md:w-6 md:h-6 bg-white/20 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.5s" }}
+                ></div>
+                <div className="absolute top-1/4 -left-8 w-3 h-3 md:w-4 md:h-4 bg-white/25 rounded-full animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -122,7 +128,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-gray-800 mb-6">
                 Mi Historia
               </h2>
               <div className="space-y-6 text-gray-600 leading-relaxed">
@@ -150,7 +156,7 @@ const About = () => {
             </div>
 
             <div className="bg-gradient-to-br from-[#F9A825]/10 to-[#FF8F00]/10 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-8">
+              <h3 className="font-heading text-2xl font-bold text-gray-800 mb-8">
                 Mis Especialidades
               </h3>
               <div className="space-y-6">
@@ -185,7 +191,7 @@ const About = () => {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Logros en Números
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -197,10 +203,10 @@ const About = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {achievements.map((achievement, index) => (
               <div
-                key={achievement.label}
+                key={index}
                 className="text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
-                <div className="text-3xl md:text-4xl font-bold text-[#F9A825] mb-2">
+                <div className="font-display text-3xl md:text-4xl font-bold text-[#F9A825] mb-2">
                   {achievement.number}
                 </div>
                 <div className="text-gray-600 font-medium">
@@ -216,7 +222,7 @@ const About = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Mis Valores
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -242,7 +248,7 @@ const About = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
+              <h3 className="font-heading text-xl font-bold text-gray-800 mb-4">
                 Innovación Constante
               </h3>
               <p className="text-gray-600">
@@ -267,7 +273,7 @@ const About = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
+              <h3 className="font-heading text-xl font-bold text-gray-800 mb-4">
                 Resultados Medibles
               </h3>
               <p className="text-gray-600">
@@ -292,7 +298,7 @@ const About = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
+              <h3 className="font-heading text-xl font-bold text-gray-800 mb-4">
                 Pasión Auténtica
               </h3>
               <p className="text-gray-600">
@@ -307,7 +313,7 @@ const About = () => {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-[#F9A825] to-[#FF8F00]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6">
             ¿Listo para Transformar tu Negocio?
           </h2>
           <p className="text-xl mb-8 opacity-90">

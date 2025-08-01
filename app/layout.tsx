@@ -1,39 +1,48 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import {
-  ClerkProvider,    
-} from "@clerk/nextjs";
+// app/layout.tsx
+import { Inter, Poppins, Montserrat } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Configuración optimizada de fuentes
+const inter = Inter({
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const poppins = Poppins({
   subsets: ["latin"],
+  display: "swap",
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  title: "Dosis de Marketing",
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+export const metadata = {
+  title: "Dosis de Marketing - Marketing Digital Profesional",
   description:
-    "Impulsa tu negocio con estrategias de marketing digital efectivas. Aprende, aplica y crece con contenido práctico y actualizado.",
+    "Especialistas en marketing digital, redes sociales, branding y desarrollo web. Transformamos tu negocio con estrategias efectivas.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {children}
-        </body>
+      <html
+        lang="es"
+        className={`${inter.variable} ${poppins.variable} ${montserrat.variable} font-smooth`}
+      >
+        <body className="antialiased">{children}</body>
       </html>
     </ClerkProvider>
   );

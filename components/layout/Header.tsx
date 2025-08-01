@@ -7,10 +7,10 @@ import {
   SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   menuOpen: boolean;
@@ -20,6 +20,7 @@ interface HeaderProps {
 const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState("/");
+
   const router = useRouter();
 
   // Function to handle sign-in redirection
@@ -90,7 +91,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             <h1 className="text-xl font-bold bg-gradient-to-r from-[#F9A825] to-[#FF8F00] bg-clip-text text-transparent">
               Dosis de Marketing
             </h1>
-            <p className="text-xs text-gray-500 font-medium">
+            <p className="font-heading text-sm text-gray-500 font-medium">
               Marketing Digital
             </p>
           </div>

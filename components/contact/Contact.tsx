@@ -90,7 +90,7 @@ const Contact = () => {
       <section className="bg-gradient-to-br from-[#F9A825] via-[#FF8F00] to-[#F57C00] text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Hablemos de tu{" "}
               <span className="text-white drop-shadow-lg">Proyecto</span>
             </h1>
@@ -117,7 +117,7 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">
+              <h2 className="font-heading text-3xl font-bold text-gray-800 mb-6">
                 Cuéntanos sobre tu proyecto
               </h2>
               <p className="text-gray-600 mb-8">

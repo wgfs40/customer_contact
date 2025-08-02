@@ -1,16 +1,11 @@
 "use client";
 
+import { Stat } from "@/types/admin/Stat";
 import RecentActivityAdmin from "./RecentActivityAdmin";
 import StatAdmin from "./StatAdmin";
 
 interface HeaderAdminProps {
-  stats: {
-    icon: string;
-    value: string;
-    label: string;
-    change: string;
-    trend: "up" | "down";
-  }[];
+  stats: Stat[];
 }
 const DashboardAdmin = ({ stats }: HeaderAdminProps) => {
   return (

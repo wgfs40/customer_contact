@@ -1,87 +1,146 @@
 "use client";
 
+import useContacts from "@/hooks/useContacts";
+import { useService } from "@/hooks/useService";
+import { ContactFormData } from "@/types/home/contact";
 import React, { useState } from "react";
 
-interface ContactForm {
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  service: string;
-  budget: string;
-  message: string;
-}
-
 const Contact = () => {
-  const [formData, setFormData] = useState<ContactForm>({
-    name: "",
+  const { createContact, loading, error, validateEmail } = useContacts();
+  const { services } = useService();
+
+  const [formData, setFormData] = useState<ContactFormData>({
+    full_name: "",
     email: "",
     phone: "",
     company: "",
-    service: "",
-    budget: "",
+    subject: "",
     message: "",
+    contact_type: "general", // Agregar tipo por defecto
+    source: "website", // Agregar source
+    preferred_contact_method: "email", // Agregar método preferido
+    is_newsletter_subscribed: false, // Agregar suscripción
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  const services = [
-    "Marketing Digital Integral",
-    "Gestión de Redes Sociales",
-    "Branding & Identidad Visual",
-    "Desarrollo Web",
-    "Consultoría Estratégica",
-    "E-commerce",
-    "Email Marketing",
-    "Análisis y Reportes",
-  ];
+  // Validación del formulario
+  const validateForm = async (): Promise<boolean> => {
+    const errors: Record<string, string> = {};
 
-  const budgetRanges = [
-    "Menos de $500",
-    "$500 - $1,000",
-    "$1,000 - $2,500",
-    "$2,500 - $5,000",
-    "$5,000 - $10,000",
-    "Más de $10,000",
-    "A definir",
-  ];
+    // Validar nombre
+    if (!formData.full_name?.trim()) {
+      errors.full_name = "El nombre es requerido";
+    }
+
+    // Validar email
+    if (!formData.email?.trim()) {
+      errors.email = "El email es requerido";
+    } else if (!(await validateEmail(formData.email))) {
+      errors.email = "El formato del email no es válido";
+    }
+
+    // Validar asunto
+    if (!formData.subject?.trim()) {
+      errors.subject = "Debes seleccionar un servicio";
+    }
+
+    // Validar mensaje
+    if (!formData.message?.trim()) {
+      errors.message = "El mensaje es requerido";
+    } else if (formData.message.trim().length < 10) {
+      errors.message = "El mensaje debe tener al menos 10 caracteres";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement;
+
+    // Manejar checkbox
+    const finalValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: finalValue,
     }));
+
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar formulario
+    const isValid = await validateForm();
+    if (!isValid) {
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simular envío del formulario
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Preparar datos con metadata adicional
+      const contactDataWithMetadata: ContactFormData = {
+        ...formData,
+        source: "website_contact_form",
+        metadata: {
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+          page: "contact",
+          referrer: document.referrer,
+        },
+      };
 
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+      const success = await createContact(contactDataWithMetadata, true);
 
-    // Reset form after success
-    setTimeout(() => {
-      setSubmitSuccess(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        service: "",
-        budget: "",
-        message: "",
+      if (success) {
+        setSubmitSuccess(true);
+
+        // Reset form after success
+        setTimeout(() => {
+          setSubmitSuccess(false);
+          setFormData({
+            full_name: "",
+            email: "",
+            phone: "",
+            company: "",
+            subject: "",
+            message: "",
+            contact_type: "general",
+            source: "website",
+            preferred_contact_method: "email",
+            is_newsletter_subscribed: false,
+          });
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error creating contact:", error);
+      setFormErrors({
+        submit:
+          "Ha ocurrido un error al enviar el mensaje. Por favor intenta nuevamente.",
       });
-    }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -125,6 +184,30 @@ const Contact = () => {
                 menos de 24 horas para discutir tu proyecto.
               </p>
 
+              {/* Mostrar error general si existe */}
+              {(error || formErrors.submit) && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <p className="text-red-700 text-sm">
+                      {error || formErrors.submit}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {submitSuccess ? (
                 <div className="text-center py-12">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -158,21 +241,30 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label
-                        htmlFor="name"
+                        htmlFor="full_name"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
                         Nombre completo *
                       </label>
                       <input
                         type="text"
-                        id="name"
-                        name="name"
+                        id="full_name"
+                        name="full_name"
                         required
-                        value={formData.name}
+                        value={formData.full_name}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300 ${
+                          formErrors.full_name
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300"
+                        }`}
                         placeholder="Tu nombre completo"
                       />
+                      {formErrors.full_name && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {formErrors.full_name}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -189,9 +281,18 @@ const Contact = () => {
                         required
                         value={formData.email}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300 ${
+                          formErrors.email
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300"
+                        }`}
                         placeholder="tu@empresa.com"
                       />
+                      {formErrors.email && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {formErrors.email}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -207,7 +308,7 @@ const Contact = () => {
                         type="tel"
                         id="phone"
                         name="phone"
-                        value={formData.phone}
+                        value={formData.phone || ""}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
                         placeholder="+1 (555) 123-4567"
@@ -225,7 +326,7 @@ const Contact = () => {
                         type="text"
                         id="company"
                         name="company"
-                        value={formData.company}
+                        value={formData.company || ""}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
                         placeholder="Nombre de tu empresa"
@@ -233,52 +334,38 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-1 gap-6">
                     <div>
                       <label
-                        htmlFor="service"
+                        htmlFor="subject"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        Servicio de interés *
+                        Consulta sobre servicios *
                       </label>
                       <select
-                        id="service"
-                        name="service"
+                        id="subject"
+                        name="subject"
                         required
-                        value={formData.service}
+                        value={formData.subject}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300 ${
+                          formErrors.subject
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300"
+                        }`}
                       >
                         <option value="">Selecciona un servicio</option>
                         {services.map((service) => (
-                          <option key={service} value={service}>
-                            {service}
+                          <option key={service.id} value={service.title}>
+                            {service.title}
                           </option>
                         ))}
                       </select>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="budget"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Presupuesto estimado
-                      </label>
-                      <select
-                        id="budget"
-                        name="budget"
-                        value={formData.budget}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
-                      >
-                        <option value="">Selecciona un rango</option>
-                        {budgetRanges.map((range) => (
-                          <option key={range} value={range}>
-                            {range}
-                          </option>
-                        ))}
-                      </select>
+                      {formErrors.subject && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {formErrors.subject}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -296,21 +383,94 @@ const Contact = () => {
                       rows={6}
                       value={formData.message}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300 resize-none"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300 resize-none ${
+                        formErrors.message
+                          ? "border-red-300 bg-red-50"
+                          : "border-gray-300"
+                      }`}
                       placeholder="Describe tu proyecto, objetivos, desafíos actuales y qué esperas lograr con nuestros servicios..."
                     />
+                    {formErrors.message && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {formErrors.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Campos adicionales */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label
+                        htmlFor="preferred_contact_method"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Método de contacto preferido
+                      </label>
+                      <select
+                        id="preferred_contact_method"
+                        name="preferred_contact_method"
+                        value={formData.preferred_contact_method || "email"}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
+                      >
+                        <option value="email">Email</option>
+                        <option value="phone">Teléfono</option>
+                        <option value="whatsapp">WhatsApp</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="contact_type"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Tipo de consulta
+                      </label>
+                      <select
+                        id="contact_type"
+                        name="contact_type"
+                        value={formData.contact_type || "general"}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F9A825] focus:border-transparent transition-all duration-300"
+                      >
+                        <option value="general">General</option>
+                        <option value="sales">Ventas</option>
+                        <option value="support">Soporte</option>
+                        <option value="partnership">Alianzas</option>
+                        <option value="media">Medios</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Newsletter checkbox */}
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="is_newsletter_subscribed"
+                      name="is_newsletter_subscribed"
+                      checked={formData.is_newsletter_subscribed || false}
+                      onChange={handleInputChange}
+                      className="mt-1 w-4 h-4 text-[#F9A825] border-gray-300 rounded focus:ring-[#F9A825]"
+                    />
+                    <label
+                      htmlFor="is_newsletter_subscribed"
+                      className="text-sm text-gray-600"
+                    >
+                      Sí, quiero recibir información sobre nuevos servicios y
+                      consejos de marketing digital.
+                    </label>
                   </div>
 
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loading}
                     className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-300 ${
-                      isSubmitting
+                      isSubmitting || loading
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-gradient-to-r from-[#F9A825] to-[#FF8F00] hover:shadow-lg hover:scale-105 active:scale-95"
                     } text-white`}
                   >
-                    {isSubmitting ? (
+                    {isSubmitting || loading ? (
                       <div className="flex items-center justify-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         Enviando mensaje...
@@ -331,6 +491,7 @@ const Contact = () => {
 
           {/* Contact Information & Map */}
           <div className="space-y-8">
+            {/* ... resto del componente sin cambios ... */}
             {/* Contact Cards */}
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <h3 className="text-xl font-bold text-gray-800 mb-6">

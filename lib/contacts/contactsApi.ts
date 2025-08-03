@@ -90,8 +90,7 @@ export const createContact = async (
       p_metadata: insertData.metadata,
     });
 
-    if (error) {
-      console.error("Error creating contact:", error);
+    if (error) {     
       return {
         success: false,
         error: "Failed to create contact",
@@ -511,6 +510,7 @@ export const createContactResponse = async (
       .update({ response_sent_at: new Date().toISOString() })
       .eq("id", contactId);
 
+     
     return {
       success: true,
       data,

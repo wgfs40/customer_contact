@@ -145,3 +145,8 @@ export interface ContactAPIResponse {
   error?: string;
   message?: string;
 }
+
+export interface ContactData {
+  contact_id: string;
+  message: string;
+}

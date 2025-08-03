@@ -37,23 +37,28 @@ const Contact = () => {
   const validateForm = async (): Promise<boolean> => {
     const errors: Record<string, string> = {};
 
-    if (!formData.full_name?.trim()) {
-      errors.full_name = "El nombre es requerido";
-    }
+    const requiredFields: { key: keyof ContactFormData; message: string }[] = [
+      { key: "full_name", message: "El nombre es requerido" },
+      { key: "email", message: "El email es requerido" },
+      { key: "subject", message: "Debes seleccionar un servicio" },
+      { key: "message", message: "El mensaje es requerido" },
+    ];
 
-    if (!formData.email?.trim()) {
-      errors.email = "El email es requerido";
-    } else if (!(await validateEmail(formData.email))) {
+    requiredFields.forEach(({ key, message }) => {
+      if (!formData[key]?.toString().trim()) {
+        errors[key] = message;
+      }
+    });
+
+    if (formData.email && !(await validateEmail(formData.email))) {
       errors.email = "El formato del email no es válido";
     }
 
-    if (!formData.subject?.trim()) {
-      errors.subject = "Debes seleccionar un servicio";
-    }
-
-    if (!formData.message?.trim()) {
-      errors.message = "El mensaje es requerido";
-    } else if (formData.message.trim().length < 10) {
+    if (
+      formData.message &&
+      formData.message.trim().length > 0 &&
+      formData.message.trim().length < 10
+    ) {
       errors.message = "El mensaje debe tener al menos 10 caracteres";
     }
 
@@ -87,12 +92,12 @@ const Contact = () => {
     }
   };
 
-  const handleFormSubmit = async (data: ContactFormData) => {
+  const handleFormSubmit = async (data: ContactFormData) => {   
     const isValid = await validateForm();
     if (!isValid) {
       return;
     }
-
+   
     setIsSubmitting(true);
 
     try {
@@ -129,7 +134,7 @@ const Contact = () => {
           });
         }, 3000);
       }
-    } catch (error: unknown) {      
+    } catch (error: unknown) {
       setFormErrors({
         submit: `Ha ocurrido un error al enviar el mensaje. Por favor intenta nuevamente. ${
           error instanceof Error ? error.message : "Error desconocido"

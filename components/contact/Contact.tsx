@@ -92,12 +92,13 @@ const Contact = () => {
     }
   };
 
-  const handleFormSubmit = async (data: ContactFormData) => {   
+  const handleFormSubmit = async (data: ContactFormData) => {
+    console.log("Form data before validation:", data);
     const isValid = await validateForm();
     if (!isValid) {
       return;
     }
-   
+    console.log("Form data after validation:", data);
     setIsSubmitting(true);
 
     try {

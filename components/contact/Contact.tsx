@@ -129,15 +129,11 @@ const Contact = () => {
           });
         }, 3000);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Error creating contact:", error.message);
-      } else {
-        console.error("Error creating contact:", error);
-      }
+    } catch (error: unknown) {      
       setFormErrors({
-        submit:
-          "Ha ocurrido un error al enviar el mensaje. Por favor intenta nuevamente.",
+        submit: `Ha ocurrido un error al enviar el mensaje. Por favor intenta nuevamente. ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`,
       });
     } finally {
       setIsSubmitting(false);

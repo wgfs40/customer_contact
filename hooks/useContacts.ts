@@ -1265,8 +1265,9 @@ export const useContacts = (
     [handleError]
   );
 
+
   // ================================================================
-  // RETRY FUNCTIONALITY
+  // RETRY FUNCTIONALITY CORREGIDA
   // ================================================================
 
   const retryLastOperation = useCallback(async (): Promise<void> => {
@@ -1281,73 +1282,97 @@ export const useContacts = (
         case "refreshContacts":
           await refreshContacts();
           break;
+
         case "createContact":
           await createContact(
             ...(lastOperation.params as [ContactFormData, boolean?])
           );
           break;
+
         case "loadContact":
           await loadContact(...(lastOperation.params as [string]));
           break;
+
         case "searchContacts":
           await searchContacts(...(lastOperation.params as [string]));
           break;
+
         case "markAsProcessed":
           await markAsProcessed(
             ...(lastOperation.params as [string, string?, string?])
           );
           break;
+
         case "updateStatus":
           await updateStatus(
             ...(lastOperation.params as [string, Contact["status"], string?])
           );
           break;
+
         case "updatePriority":
           await updatePriority(
             ...(lastOperation.params as [string, Contact["priority"]])
           );
           break;
+
         case "addTags":
           await addTags(...(lastOperation.params as [string, string[]]));
           break;
+
         case "processContact":
           await processContact(
             ...(lastOperation.params as [string, string?, string?])
           );
           break;
+
         case "loadContactResponses":
           await loadContactResponses(...(lastOperation.params as [string]));
           break;
+
         case "sendAutoResponse":
           await sendAutoResponse(
             ...(lastOperation.params as [string, string?])
           );
           break;
+
         case "createResponse":
           await createResponse(
             ...(lastOperation.params as [string, ContactResponse])
           );
           break;
+
         case "loadTemplates":
-          await loadTemplates(...lastOperation.params);
+          await loadTemplates(...(lastOperation.params as [string?, string?]));
           break;
+
         case "createTemplate":
           await createTemplate(...(lastOperation.params as [ContactTemplate]));
           break;
+
         case "loadDashboardStats":
-          await loadDashboardStats(...lastOperation.params);
+          await loadDashboardStats(
+            ...(lastOperation.params as [string?, string?])
+          );
           break;
+
         case "loadConversionMetrics":
-          await loadConversionMetrics(...lastOperation.params);
+          await loadConversionMetrics(
+            ...(lastOperation.params as [string?, string?])
+          );
           break;
+
         case "getContactSummary":
           await getContactSummary(...(lastOperation.params as [string]));
           break;
+
         default:
-          console.warn("Unknown operation type for retry:", lastOperation.type);
+          console.warn(
+            "Tipo de operación desconocido para retry:",
+            lastOperation.type
+          );
       }
     } catch (error) {
-      console.error("Retry failed:", error);
+      console.error("Retry falló:", error);
       // El error se manejará en la función específica
     }
   }, [

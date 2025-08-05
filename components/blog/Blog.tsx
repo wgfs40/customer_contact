@@ -21,7 +21,7 @@ const Blog = () => {
     loading,
     error,
     searchResults,
-    searchLoading,    
+    searchLoading,
     loadCategories,
     loadTags,
     searchPosts,
@@ -33,7 +33,7 @@ const Blog = () => {
   } = useBlog({
     autoLoad: true,
     status: "published", // Solo posts publicados
-    sort_by: "published_at",
+    sort_by: "publish_date",
     sort_order: "desc",
     limit: 12,
   });
@@ -293,7 +293,7 @@ const Blog = () => {
                         </div>
                         <div className="p-6">
                           <div className="flex items-center text-sm text-gray-500 mb-3">
-                            <span>{formatDate(post.published_at)}</span>
+                            <span>{formatDate(post.publish_date)}</span>
                             <span className="mx-2">•</span>
                             <span>{formatReadingTime(post.reading_time)}</span>
                             <span className="mx-2">•</span>
@@ -378,7 +378,7 @@ const Blog = () => {
                         </div>
                         <div className="md:w-2/3 p-6">
                           <div className="flex items-center text-sm text-gray-500 mb-3">
-                            <span>{formatDate(post.published_at)}</span>
+                            <span>{formatDate(post.publish_date)}</span>
                             <span className="mx-2">•</span>
                             <span>{formatReadingTime(post.reading_time)}</span>
                             <span className="mx-2">•</span>
@@ -431,7 +431,7 @@ const Blog = () => {
                                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                 />
                               </svg>
-                              {post.views || 0}
+                              {post.views_count || 0}
                             </span>
                             <span className="flex items-center gap-1">
                               <svg
@@ -447,7 +447,7 @@ const Blog = () => {
                                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                                 />
                               </svg>
-                              {post.likes || 0}
+                              {post.likes_count || 0}
                             </span>
                             <span className="flex items-center gap-1">
                               <svg
@@ -463,7 +463,7 @@ const Blog = () => {
                                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                 />
                               </svg>
-                              {post._count?.comments || 0}
+                              {post._count?.comments_count || 0}
                             </span>
                           </div>
                         </div>
@@ -573,12 +573,13 @@ const Blog = () => {
                             {post.title}
                           </h4>
                           <p className="text-xs text-gray-500 mt-1">
-                            {post.views || 0} visualizaciones
+                            {post.views_count || 0} visualizaciones
                           </p>
                         </div>
                       </div>
                     ))}
                   </div>
+                  
                 </div>
               )}
 
@@ -658,7 +659,7 @@ const Blog = () => {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    {formatDate(selectedPost.published_at)}
+                    {formatDate(selectedPost.publish_date)}
                   </span>
                   <span className="flex items-center gap-1">
                     <svg
@@ -746,18 +747,20 @@ const Blog = () => {
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3">Tags:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedPost.tags.map((tag: { id: string; name: string }) => (
-                      <span
-                        key={tag.id}
-                        className="bg-[#F9A825]/10 text-[#F9A825] px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-[#F9A825] hover:text-white transition-colors"
-                        onClick={() => {
-                          setSearchTerm(tag.name);
-                          closePost();
-                        }}
-                      >
-                        #{tag.name}
-                      </span>
-                    ))}
+                    {selectedPost.tags.map(
+                      (tag: { id: string; name: string }) => (
+                        <span
+                          key={tag.id}
+                          className="bg-[#F9A825]/10 text-[#F9A825] px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-[#F9A825] hover:text-white transition-colors"
+                          onClick={() => {
+                            setSearchTerm(tag.name);
+                            closePost();
+                          }}
+                        >
+                          #{tag.name}
+                        </span>
+                      )
+                    )}
                   </div>
                 </div>
               )}
@@ -785,7 +788,7 @@ const Blog = () => {
                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                       />
                     </svg>
-                    {selectedPost.views || 0} visualizaciones
+                    {selectedPost.views_count || 0} visualizaciones
                   </span>
                   <span className="flex items-center gap-1">
                     <svg
@@ -801,7 +804,7 @@ const Blog = () => {
                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                       />
                     </svg>
-                    {selectedPost.likes || 0} me gusta
+                    {selectedPost.likes_count || 0} me gusta
                   </span>
                   <span className="flex items-center gap-1">
                     <svg
@@ -817,7 +820,7 @@ const Blog = () => {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
-                    {selectedPost._count?.comments || 0} comentarios
+                    {selectedPost._count?.comments_count || 0} comentarios
                   </span>
                 </div>
 

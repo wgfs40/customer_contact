@@ -36,7 +36,7 @@ import {
   getRecentPostsAction,
   getBlogStatsAction,
   generateSlugAction,
-  validateSlugAction,  
+  validateSlugAction,
 } from "@/actions/blog_actions";
 
 // ================================================================
@@ -262,7 +262,12 @@ export const useBlog = (
   const handleError = useCallback(
     (error: unknown, operation: string, fallbackMessage: string) => {
       let errorMessage: string;
-      if (typeof error === "object" && error !== null && "message" in error && typeof (error as { message?: unknown }).message === "string") {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+      ) {
         errorMessage = (error as { message: string }).message;
       } else if (typeof error === "string") {
         errorMessage = error;
@@ -324,6 +329,11 @@ export const useBlog = (
 
       const result = await getAllBlogPostsAction(state.filters);
 
+      console.log(
+        "[useBlog.refreshPosts] wilson fernandez Result:",
+        result.data && result.data[0] ? result.data[0].publish_date : []
+      );
+      //publish_date
       if (result.success) {
         setState((prev) => ({
           ...prev,
@@ -1185,17 +1195,13 @@ export const useBlog = (
           await refreshPosts();
           break;
         case "createPost":
-          await createPost(
-            ...(op.params as [CreateBlogPostData, boolean?])
-          );
+          await createPost(...(op.params as [CreateBlogPostData, boolean?]));
           break;
         case "loadPost":
           await loadPost(...(op.params as [string, boolean?]));
           break;
         case "searchPosts":
-          await searchPosts(
-            ...(op.params as [string, Partial<BlogFilters>?])
-          );
+          await searchPosts(...(op.params as [string, Partial<BlogFilters>?]));
           break;
         case "publishPost":
           await publishPost(...(op.params as [string]));
@@ -1233,10 +1239,7 @@ export const useBlog = (
           break;
         case "loadComments":
           await loadComments(
-            ...(op.params as [
-              string,
-              ("approved" | "pending" | "rejected")?
-            ])
+            ...(op.params as [string, ("approved" | "pending" | "rejected")?])
           );
           break;
         case "createComment":
@@ -1287,7 +1290,9 @@ export const useBlog = (
   const hasActiveFilters = useMemo(() => {
     return Object.entries(state.filters)
       .filter(([key]) => key !== "page")
-      .some(([, value]) => value !== undefined && value !== null && value !== "");
+      .some(
+        ([, value]) => value !== undefined && value !== null && value !== ""
+      );
   }, [state.filters]);
 
   const postsByStatus = useMemo(() => {

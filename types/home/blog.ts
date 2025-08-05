@@ -7,7 +7,7 @@ export type CommentStatus = "pending" | "approved" | "rejected";
 export type BlogSortBy =
   | "created_at"
   | "updated_at"
-  | "published_at"
+  | "publish_date"
   | "title"
   | "views"
   | "likes";
@@ -35,7 +35,7 @@ export interface BlogPost {
   likes_count: number;
   shares_count: number;
   reading_time?: number; // en minutos
-  published_at?: string;
+  publish_date?: string;
   scheduled_at?: string;
   created_at: string;
   updated_at: string;
@@ -109,7 +109,7 @@ export interface UpdateBlogPostData {
   is_featured?: boolean;
   allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
-  published_at?: string | null;
+  published_date?: string | null;
   scheduled_at?: string | null;
 }
 

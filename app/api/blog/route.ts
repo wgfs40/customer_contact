@@ -23,12 +23,7 @@ export async function GET(request: NextRequest) {
       tag: searchParams.get("tag") || undefined,
       search: searchParams.get("search") || undefined,
       sort_by:
-        (searchParams.get("sort_by") as
-          | "created_at"
-          | "title"
-          | "updated_at"
-          | "status"
-          | undefined) || "created_at",
+        (searchParams.get("sort_by") as BlogFilters["sort_by"]) || "created_at",
       sort_order:
         (searchParams.get("sort_order") as "asc" | "desc" | undefined) ||
         "desc",

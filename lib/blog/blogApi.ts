@@ -122,7 +122,7 @@ const generateSlug = (title: string): string => {
 
 const getAuthorData = async (authorId: string) => {
   try {
-    // Primero intentar obtener desde profiles
+    // Intentar obtener desde profiles primero
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("id, full_name, avatar_url, bio, email")
@@ -132,31 +132,35 @@ const getAuthorData = async (authorId: string) => {
     if (profile && !profileError) {
       return {
         id: profile.id,
-        full_name: profile.full_name,
+        full_name: profile.full_name || "Usuario",
         avatar_url: profile.avatar_url,
         bio: profile.bio,
         email: profile.email,
       };
     }
 
-    // Si no existe profiles, intentar obtener desde auth.users
-    const { data: user, error: userError } =
-      await supabase.auth.admin.getUserById(authorId);
+    // Si no existe en profiles, intentar obtener desde una tabla users personalizada
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("id, full_name, email, avatar_url")
+      .eq("id", authorId)
+      .single();
 
     if (user && !userError) {
       return {
-        id: user.user.id,
-        full_name: user.user.user_metadata?.full_name || user.user.email,
-        avatar_url: user.user.user_metadata?.avatar_url,
+        id: user.id,
+        full_name: user.full_name || user.email || "Usuario",
+        avatar_url: user.avatar_url,
         bio: undefined,
-        email: user.user.email,
+        email: user.email,
       };
     }
 
-    // Si todo falla, retornar datos por defecto
+    // Como último recurso, crear datos básicos con el ID
+    console.warn(`No se encontraron datos para el autor: ${authorId}`);
     return {
       id: authorId,
-      full_name: "Usuario anónimo",
+      full_name: "Usuario",
       avatar_url: undefined,
       bio: undefined,
       email: undefined,
@@ -192,40 +196,45 @@ const processPostData = async (
       if (post.category_id) {
         const { data: categoryData } = await supabase
           .from("blog_categories")
-          .select("id, name, slug, color, icon, is_active")
+          .select(
+            "id, name, slug, color, icon, is_active, created_at, updated_at"
+          )
           .eq("id", post.category_id)
           .single();
         category = categoryData || undefined;
       }
 
-      // Obtener tags
+      // Obtener tags - Estructura corregida
       let tags: BlogTag[] = [];
       const { data: postTags } = await supabase
         .from("blog_post_tags")
         .select(
           `
-          tag:blog_tags(id, name, slug, color)
+          tag:blog_tags(id, name, slug, color, is_featured, description)
         `
         )
         .eq("post_id", post.id);
 
-      if (postTags) {
+      if (postTags && Array.isArray(postTags)) {
         tags = postTags
-          .flatMap(
-            (pt: {
-              tag: { id: string; name: string; slug: string; color?: string }[];
-            }) =>
-              pt.tag.map((t) => ({
-                id: t.id,
-                name: t.name,
-                slug: t.slug,
+          .map((pt: { tag: BlogTag | null }) => {
+            const t = pt.tag;
+            if (t && typeof t === "object") {
+              return {
+                id: t.id || "",
+                name: t.name || "",
+                slug: t.slug || "",
                 color: t.color,
-                is_featured: false,
-                description: "",
+                is_featured: t.is_featured || false,
+                description: t.description || "",
+                created_at: t.created_at,
+                updated_at: t.updated_at,
                 _count: undefined,
-              }))
-          )
-          .filter(Boolean);
+              };
+            }
+            return null;
+          })
+          .filter((tag): tag is NonNullable<typeof tag> => tag !== null); // Filtrar valores nulos
       }
 
       // Obtener conteo de comentarios (sin filtrar por status)
@@ -240,11 +249,11 @@ const processPostData = async (
         category,
         tags,
         _count: {
-          views: post.views || 0,
-          likes: post.likes || 0,
-          shares: post.shares || 0,
-          comments: commentsCount || 0,
-          approved_comments: commentsCount || 0,
+          views_count: post.views_count || 0,
+          likes_count: post.likes_count || 0,
+          shares_count: post.shares_count || 0,
+          comments_count: commentsCount || 0,
+          approved_comments_count: commentsCount || 0,
         },
       };
 
@@ -264,11 +273,11 @@ const processPostData = async (
         category: undefined,
         tags: [],
         _count: {
-          views: post.views || 0,
-          likes: post.likes || 0,
-          shares: post.shares || 0,
-          comments: 0,
-          approved_comments: 0,
+          views_count: post.views_count || 0,
+          likes_count: post.likes_count || 0,
+          shares_count: post.shares_count || 0,
+          comments_count: 0,
+          approved_comments_count: 0,
         },
       });
     }
@@ -414,7 +423,15 @@ export const getAllBlogPosts = async (
     }
 
     // Ordenamiento - Solo columnas que existen
-    const validSortColumns = ["id", "title", "views", "likes"];
+    const validSortColumns = [
+      "id",
+      "title",
+      "views_count",
+      "likes_count",
+      "shares_count",
+      "created_at",
+      "updated_at",
+    ];
     const sortColumn = validSortColumns.includes(sort_by) ? sort_by : "id";
     query = query.order(sortColumn, { ascending: sort_order === "asc" });
 
@@ -1045,14 +1062,14 @@ export const incrementPostViews = async (postId: string): Promise<void> => {
     // Incrementar vistas directamente
     const { data: currentPost } = await supabase
       .from("blog_posts")
-      .select("views")
+      .select("views_count")
       .eq("id", postId)
       .single();
 
     if (currentPost) {
       await supabase
         .from("blog_posts")
-        .update({ views: (currentPost.views || 0) + 1 })
+        .update({ views_count: (currentPost.views_count || 0) + 1 })
         .eq("id", postId);
     }
   } catch (error) {
@@ -1066,7 +1083,7 @@ export const getBlogStats = async (): Promise<ApiResponse<BlogStats>> => {
       await Promise.all([
         supabase
           .from("blog_posts")
-          .select("id, views, likes, shares, is_featured", {
+          .select("id, views_count, likes_count, shares_count, is_featured", {
             count: "exact",
           }),
         supabase.from("blog_categories").select("id", { count: "exact" }),
@@ -1103,9 +1120,9 @@ export const getBlogStats = async (): Promise<ApiResponse<BlogStats>> => {
       approvedComments: commentsResult.count || 0,
       pendingComments: 0,
       rejectedComments: 0,
-      totalViews: posts.reduce((sum, p) => sum + (p.views || 0), 0),
-      totalLikes: posts.reduce((sum, p) => sum + (p.likes || 0), 0),
-      totalShares: posts.reduce((sum, p) => sum + (p.shares || 0), 0),
+      totalViews: posts.reduce((sum, p) => sum + (p.views_count || 0), 0),
+      totalLikes: posts.reduce((sum, p) => sum + (p.likes_count || 0), 0),
+      totalShares: posts.reduce((sum, p) => sum + (p.shares_count || 0), 0),
       averageCommentsPerPost:
         posts.length > 0 ? (commentsResult.count || 0) / posts.length : 0,
       averageReadingTime: 5, // Default
@@ -1130,7 +1147,7 @@ export const getPopularPosts = async (
     const { data, error } = await supabase
       .from("blog_posts")
       .select("*")
-      .order("views", { ascending: false })
+      .order("views_count", { ascending: false })
       .limit(limit);
 
     if (error) {

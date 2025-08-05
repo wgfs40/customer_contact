@@ -31,9 +31,9 @@ export interface BlogPost {
   category_id?: string;
   is_featured: boolean;
   allow_comments: boolean;
-  views: number;
-  likes: number;
-  shares: number;
+  views_count: number;
+  likes_count: number;
+  shares_count: number;
   reading_time?: number; // en minutos
   published_at?: string;
   scheduled_at?: string;
@@ -56,11 +56,11 @@ export interface BlogPostWithDetails extends BlogPost {
 
   // Estadísticas extendidas
   _count?: {
-    views: number;
-    likes: number;
-    shares: number;
-    comments: number;
-    approved_comments: number;
+    views_count: number;
+    likes_count: number;
+    shares_count: number;
+    comments_count: number;
+    approved_comments_count: number;
   };
 
   // Datos adicionales
@@ -410,7 +410,7 @@ export interface BlogMetrics {
 // RESPUESTAS DE API
 // ================================================================
 
-export interface BlogApiResponse<T = any> {
+export interface BlogApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -559,44 +559,3 @@ export interface BlogSearchFilters {
   };
   content_type?: "posts" | "categories" | "tags" | "all";
 }
-
-// ================================================================
-// EXPORTAR TIPOS PRINCIPALES
-// ================================================================
-
-export type {
-  // Principales
-  BlogPost,
-  BlogPostWithDetails,
-  CreateBlogPostData,
-  UpdateBlogPostData,
-  BlogCategory,
-  BlogTag,
-  BlogComment,
-  CreateCommentData,
-  BlogFilters,
-  BlogStats,
-
-  // Adicionales
-  BlogMetrics,
-  BlogApiResponse,
-  PaginatedBlogResponse,
-  BlogPostFormData,
-  CommentFormData,
-  UseBlogPostsReturn,
-  BlogSearchResult,
-};
-
-// Exports por defecto para facilitar imports
-export default {
-  BlogPost,
-  BlogPostWithDetails,
-  CreateBlogPostData,
-  UpdateBlogPostData,
-  BlogCategory,
-  BlogTag,
-  BlogComment,
-  CreateCommentData,
-  BlogFilters,
-  BlogStats,
-};

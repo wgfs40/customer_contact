@@ -35,12 +35,12 @@ const ServicesFilterCategories = ({
           </Link>
 
           {categories.map((category) => {
-            const isSelected = selectedCategoryId === category.id;
+            const isSelected = selectedCategoryId === category.slug;
 
             return (
               <Link
                 key={category.id}
-                href={`${currentPath}?category=${category.id}`}
+                href={`${currentPath}?category=${category.slug}`}
                 className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-md ${
                   isSelected
                     ? "bg-[#F9A825] text-white"

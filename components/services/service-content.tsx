@@ -43,8 +43,8 @@ const ServicesContent = async ({ searchParams }: ServiceContentProps) => {
               <div className="inline-flex items-center gap-2 bg-[#F9A825]/10 text-[#F9A825] px-4 py-2 rounded-lg">
                 <span>Mostrando servicios de:</span>
                 <span className="font-semibold">
-                  {categories.find((cat) => cat.id === categoryFromUrl)?.name ||
-                    "Categoría"}
+                  {categories.find((cat) => cat.slug === categoryFromUrl)
+                    ?.name || "Categoría"}
                 </span>
                 <a
                   href="/services"

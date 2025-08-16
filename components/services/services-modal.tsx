@@ -2,7 +2,7 @@
 
 import { ServiceWithCategory } from "@/types/home/service";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 interface ServiceModalProps {
@@ -11,13 +11,13 @@ interface ServiceModalProps {
 
 const ServiceModal = ({ service }: ServiceModalProps) => {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
+  // Evitar hidratación mismatch
   useEffect(() => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-      document.body.style.overflow = "hidden";
-    }
+    setIsMounted(true);
+    // Prevenir scroll del body
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = "unset";
@@ -45,22 +45,36 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
     );
   };
 
+  // No renderizar hasta que esté montado
+  if (!isMounted) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F9A825] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <dialog
-      ref={dialogRef}
-      className="fixed inset-0 z-50 w-full h-full bg-black/80 backdrop-blur-sm p-4"
+    <div
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto"
       onClick={handleBackdropClick}
     >
-      <div className="relative bg-white rounded-lg max-w-4xl max-h-[90vh] mx-auto my-8 overflow-y-auto">
+      <div
+        className="bg-white rounded-lg max-w-4xl w-full my-8 relative"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header del modal */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-start z-10">
+        <div className="border-b border-gray-200 p-6 flex justify-between items-start">
           <div className="flex-1 pr-4">
             <div className="flex items-center gap-3 mb-2">
               {service.icon && !isValidImageUrl(service.icon) && (
                 <span className="text-2xl">{service.icon}</span>
               )}
               <h1 className="text-2xl font-bold text-gray-800">
-                {service.description || "Servicio sin título"}
+                {service.title || service.description || "Servicio sin título"}
               </h1>
               {service.category_name && (
                 <span className="bg-[#F9A825]/10 text-[#F9A825] px-3 py-1 rounded-full text-sm font-medium">
@@ -71,9 +85,10 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
 
             {service.price_text && (
               <div className="text-3xl font-bold text-[#F9A825]">
-                {typeof service.price_text === "number"
-                  ? `$${service.price_text}`
-                  : service.price_text}
+                {service.price_text ||
+                  (typeof service.price_text === "number"
+                    ? `$${service.price_text}`
+                    : service.price_text)}
               </div>
             )}
           </div>
@@ -99,12 +114,15 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
           </button>
         </div>
 
+        {/* Resto del contenido igual que antes... */}
         {/* Imagen principal */}
         {isValidImageUrl(service.icon) && (
           <div className="relative h-64 w-full">
             <Image
               src={service.icon!}
-              alt={service.description || "Imagen del servicio"}
+              alt={
+                service.title || service.description || "Imagen del servicio"
+              }
               fill
               className="object-cover"
               style={{ objectFit: "cover" }}
@@ -114,7 +132,7 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
         )}
 
         {/* Contenido del modal */}
-        <div className="p-6">
+        <div className="p-6 max-h-[60vh] overflow-y-auto">
           {/* Descripción */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -126,25 +144,27 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
           </div>
 
           {/* Características */}
-          {service.features && service.features.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                ¿Qué incluye este servicio?
-              </h2>
-              <div className="grid md:grid-cols-2 gap-3">
-                {service.features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-[#F9A825] rounded-full flex-shrink-0"></div>
-                    <span className="text-gray-700">{String(feature)}</span>
-                  </div>
-                ))}
+          {service.features &&
+            Array.isArray(service.features) &&
+            service.features.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  ¿Qué incluye este servicio?
+                </h2>
+                <div className="grid md:grid-cols-2 gap-3">
+                  {service.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-[#F9A825] rounded-full flex-shrink-0"></div>
+                      <span className="text-gray-700">{String(feature)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Información adicional */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {service.duration && (
+          {service.duration && (
+            <div className="mb-8">
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <svg
@@ -164,10 +184,8 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
                 </div>
                 <p className="text-gray-600">{service.duration}</p>
               </div>
-            )}
-
-            {/* You can add another property here if needed, or remove this block entirely if not required */}
-          </div>
+            </div>
+          )}
 
           {/* Llamada a la acción */}
           <div className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] rounded-lg p-6 text-white">
@@ -181,11 +199,12 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
+                  const serviceName =
+                    service.title || service.description || "Servicio";
                   closeModal();
-                  // Navegar a contacto con parámetros
-                  window.location.href = `/contact?service=${encodeURIComponent(
-                    service.description
-                  )}`;
+                  router.push(
+                    `/contact?service=${encodeURIComponent(serviceName)}`
+                  );
                 }}
                 className="bg-white text-[#F9A825] px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
@@ -193,10 +212,14 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
               </button>
               <button
                 onClick={() => {
+                  const serviceName =
+                    service.title || service.description || "Servicio";
                   closeModal();
-                  window.location.href = `/contact?service=${encodeURIComponent(
-                    service.description
-                  )}&action=call`;
+                  router.push(
+                    `/contact?service=${encodeURIComponent(
+                      serviceName
+                    )}&action=call`
+                  );
                 }}
                 className="border border-white/30 text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors"
               >
@@ -204,19 +227,9 @@ const ServiceModal = ({ service }: ServiceModalProps) => {
               </button>
             </div>
           </div>
-
-          {/* Link para ver página completa */}
-          <div className="mt-6 text-center">
-            <a
-              href={`/services/service/${service.category}`}
-              className="text-[#F9A825] hover:text-[#FF8F00] font-medium underline"
-            >
-              Ver página completa del servicio →
-            </a>
-          </div>
         </div>
       </div>
-    </dialog>
+    </div>
   );
 };
 

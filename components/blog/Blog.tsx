@@ -35,7 +35,7 @@ const Blog = () => {
   } = useBlog({
     autoLoad: true,
     status: "published", // Solo posts publicados
-    sort_by: "publish_date",
+    sort_by: "published_date",
     sort_order: "desc",
     limit: 12,
   });
@@ -244,7 +244,7 @@ const Blog = () => {
               <BlogCategories
                 categories={categories}
                 posts={posts.map((post) => ({
-                  categoryId: post.category?.id ?? ""
+                  categoryId: post.category?.id ?? "",
                 }))}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}

@@ -6,14 +6,18 @@ interface ServiceCardProps {
 }
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
-  // ... resto del código igual ...
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-      
+      <div className="p-6">
+        <p className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300 text-[#F9A825]">
+          {service.icon}
+        </p>
+        <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
+        <p className="text-gray-600 mb-4">{service.description}</p>
+      </div>
 
       {/* Actualizar botones de acción */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 p-6 border-t ">
         <Link
           href={`/services/service/${service.category_slug}`}
           className="flex-1 bg-[#F9A825] hover:bg-[#FF8F00] text-white py-3 px-4 rounded-lg font-medium transition-colors text-center"

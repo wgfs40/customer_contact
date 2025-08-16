@@ -4,13 +4,13 @@ import Link from "next/link";
 interface ServicesFilterCategoriesProps {
   categories: ServiceCategory[];
   selectedCategoryId?: string;
-  currentPath: string;
+  currentPath: string;  
 }
 
 const ServicesFilterCategories = ({
   categories,
   selectedCategoryId,
-  currentPath,
+  currentPath,  
 }: ServicesFilterCategoriesProps) => {
   return (
     <>

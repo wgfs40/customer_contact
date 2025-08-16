@@ -128,13 +128,13 @@ interface UseBlogReturn extends UseBlogState {
   // Categorías
   loadCategories: () => Promise<void>;
   createCategory: (
-    categoryData: Omit<BlogCategory, "id" | "created_at" | "updated_at">
+    categoryData: Omit<BlogCategory, "id">
   ) => Promise<boolean>;
 
   // Tags
   loadTags: () => Promise<void>;
   createTag: (
-    tagData: Omit<BlogTag, "id" | "created_at" | "updated_at">
+    tagData: Omit<BlogTag, "id">
   ) => Promise<boolean>;
 
   // Comentarios
@@ -713,7 +713,7 @@ export const useBlog = (
 
   const createCategory = useCallback(
     async (
-      categoryData: Omit<BlogCategory, "id" | "created_at" | "updated_at">
+      categoryData: Omit<BlogCategory, "id">
     ): Promise<boolean> => {
       try {
         setState((prev) => ({
@@ -789,7 +789,7 @@ export const useBlog = (
 
   const createTag = useCallback(
     async (
-      tagData: Omit<BlogTag, "id" | "created_at" | "updated_at">
+      tagData: Omit<BlogTag, "id">
     ): Promise<boolean> => {
       try {
         setState((prev) => ({
@@ -1222,9 +1222,7 @@ export const useBlog = (
           break;
         case "createCategory":
           await createCategory(
-            ...(op.params as [
-              Omit<BlogCategory, "id" | "created_at" | "updated_at">
-            ])
+            ...(op.params as [Omit<BlogCategory, "id">])
           );
           break;
         case "loadTags":
@@ -1232,9 +1230,7 @@ export const useBlog = (
           break;
         case "createTag":
           await createTag(
-            ...(op.params as [
-              Omit<BlogTag, "id" | "created_at" | "updated_at">
-            ])
+            ...(op.params as [Omit<BlogTag, "id">])
           );
           break;
         case "loadComments":

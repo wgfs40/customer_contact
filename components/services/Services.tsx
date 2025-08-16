@@ -9,7 +9,6 @@ import ServicesGrid from "./services-grid";
 import { getServiceCategoriesAction } from "@/actions/services_actions";
 
 const Services = () => {
-  
   const {
     categories,
     services,
@@ -44,19 +43,19 @@ const Services = () => {
       <ServicesHero />
 
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <ServicesFilterCategories
+        {/* <ServicesFilterCategories
           categories={categories}
-          selectedCategory={selectedCategory}
+          selectedCategoryId={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           isLoadingCategories={isLoadingCategories}
           isLoadingServices={isLoadingServices}
-        />
+        /> */}
 
-        <ServicesGrid
+        {/* <ServicesGrid
           filteredServices={filteredServices}
           isLoadingServices={isLoadingServices}
           openServiceModal={openServiceModal}
-        />
+        /> */}
 
         {/* Empty State */}
         {!isLoadingServices && filteredServices.length === 0 && (

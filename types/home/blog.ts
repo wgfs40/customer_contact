@@ -7,7 +7,7 @@ export type CommentStatus = "pending" | "approved" | "rejected";
 export type BlogSortBy =
   | "created_at"
   | "updated_at"
-  | "publish_date"
+  | "published_date"
   | "title"
   | "views"
   | "likes";

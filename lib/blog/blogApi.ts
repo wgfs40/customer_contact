@@ -210,17 +210,16 @@ const processPostData = async (
         .from("blog_post_tags")
         .select(
           `
-          tag:blog_tags(id, name, slug, color, is_featured, description)
+          tag:blog_tags(id, name, slug, color, is_featured, description, created_at, updated_at)
         `
         )
         .eq("post_id", post.id);
 
       if (postTags && Array.isArray(postTags)) {
         tags = postTags
-          .map((pt: { tag: BlogTag | null }) => {
-            const t = pt.tag;
-            if (t && typeof t === "object") {
-              return {
+          .flatMap((pt: { tag: BlogTag | BlogTag[] }) => {
+            if (Array.isArray(pt.tag)) {
+              return pt.tag.map((t) => ({
                 id: t.id || "",
                 name: t.name || "",
                 slug: t.slug || "",
@@ -230,9 +229,22 @@ const processPostData = async (
                 created_at: t.created_at,
                 updated_at: t.updated_at,
                 _count: undefined,
-              };
+              }));
+            } else if (pt.tag && typeof pt.tag === "object") {
+              const t = pt.tag as BlogTag;
+              return [{
+                id: t.id || "",
+                name: t.name || "",
+                slug: t.slug || "",
+                color: t.color,
+                is_featured: t.is_featured || false,
+                description: t.description || "",
+                created_at: t.created_at,
+                updated_at: t.updated_at,
+                _count: undefined,
+              }];
             }
-            return null;
+            return [];
           })
           .filter((tag): tag is NonNullable<typeof tag> => tag !== null); // Filtrar valores nulos
       }

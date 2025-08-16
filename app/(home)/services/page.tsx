@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 // Tipado correcto para searchParams
 interface ServicePageProps {
-  searchParams: Promise<{ category?: string }> | { category?: string };
+  searchParams: Promise<{ category?: string }>;
 }
 
 const ServicePage = async ({ searchParams }: ServicePageProps) => {

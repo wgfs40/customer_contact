@@ -17,7 +17,8 @@ const BlogHero: React.FC<BlogHeroProps> = ({
   handleClearFilters,
 }) => {
   return (
-    <div>    {/* Hero Section */}
+    <div>    
+      {/* Hero Section */}
           <div className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] text-white py-16">
             <div className="max-w-7xl mx-auto px-4">
               <div className="text-center">

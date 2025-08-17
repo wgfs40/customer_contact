@@ -1,27 +1,14 @@
-"use client";
-
 interface BlogCategoriesProps {
   categories: { id: string; name: string; _count?: { posts: number } }[];
   posts: { categoryId: string }[];
   selectedCategory: string;
-  setSelectedCategory: (categoryId: string) => void;
-  updateFilters: (filters: { category_id?: string; page?: number }) => void;
 }
 
 const BlogCategories = ({
   categories,
   posts,
   selectedCategory,
-  setSelectedCategory,
-  updateFilters,
 }: BlogCategoriesProps) => {
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    updateFilters({
-      category_id: categoryId !== "all" ? categoryId : undefined,
-      page: 1,
-    });
-  };
   return (
     <div>
       {" "}
@@ -33,9 +20,8 @@ const BlogCategories = ({
         </h3>
         <div className="space-y-2">
           <button
-            onClick={() => handleCategoryChange("all")}
             className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
-              selectedCategory === "all"
+              "all" === "all"
                 ? "bg-[#F9A825] text-white shadow-md"
                 : "text-gray-700 hover:bg-[#F9A825]/10"
             }`}
@@ -53,7 +39,6 @@ const BlogCategories = ({
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => handleCategoryChange(category.id)}
               className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
                 selectedCategory === category.id
                   ? "bg-[#F9A825] text-white shadow-md"

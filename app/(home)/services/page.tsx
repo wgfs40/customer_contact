@@ -1,5 +1,7 @@
 import ServicesPageSkeleton from "@/components/customs/loading/ServicesPageSkeleton";
-import ServicesContent from "@/components/services/service-content";
+import ServiceCard from "@/components/services/service-card";
+import ServicesFilterCategories from "@/components/services/services-filter-categories";
+import ServicesHero from "@/components/services/services-hero";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -18,18 +20,33 @@ export const metadata: Metadata = {
   },
 };
 
-// Tipado correcto para searchParams
-interface ServicePageProps {
-  searchParams: Promise<{ category?: string }>;
-}
+const ServicePage = async ({
+  searchParams,
+}: {
+  searchParams?: Promise<{ query?: string; page?: string; category?: string }>;
+}) => {
+  const resolvedSearchParams = await searchParams;
 
-const ServicePage = async ({ searchParams }: ServicePageProps) => {
+  const query = resolvedSearchParams?.query || "";
+  const page = Number(resolvedSearchParams?.page) || 1;
+  const category = resolvedSearchParams?.category || "";
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="min-h-screen bg-gray-50">
-        <Suspense fallback={<ServicesPageSkeleton />}>
-          <ServicesContent searchParams={searchParams} />
-        </Suspense>
+        <ServicesHero />
+
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          {/* Filtros de categorías */}
+          <ServicesFilterCategories />
+
+          <Suspense
+            key={query + page + category}
+            fallback={<ServicesPageSkeleton />}
+          >
+            <ServiceCard categorySlug={category || query} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

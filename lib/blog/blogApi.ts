@@ -191,6 +191,9 @@ const processPostData = async (
       // Obtener datos del autor
       const author = await getAuthorData(post.author_id);
 
+      author.full_name =
+        author.full_name === "Usuario" ? post.author_name : author.full_name;
+
       // Obtener categoría si existe category_id
       let category: BlogCategory | undefined = undefined;
       if (post.category_id) {
@@ -210,7 +213,7 @@ const processPostData = async (
         .from("blog_post_tags")
         .select(
           `
-          tag:blog_tags(id, name, slug, color, is_featured, description, created_at, updated_at)
+          tag:blog_tags(id, name, slug, color, featured, description, created_at, updated_at)
         `
         )
         .eq("post_id", post.id);
@@ -224,7 +227,7 @@ const processPostData = async (
                 name: t.name || "",
                 slug: t.slug || "",
                 color: t.color,
-                is_featured: t.is_featured || false,
+                featured: t.featured || false,
                 description: t.description || "",
                 created_at: t.created_at,
                 updated_at: t.updated_at,
@@ -232,17 +235,19 @@ const processPostData = async (
               }));
             } else if (pt.tag && typeof pt.tag === "object") {
               const t = pt.tag as BlogTag;
-              return [{
-                id: t.id || "",
-                name: t.name || "",
-                slug: t.slug || "",
-                color: t.color,
-                is_featured: t.is_featured || false,
-                description: t.description || "",
-                created_at: t.created_at,
-                updated_at: t.updated_at,
-                _count: undefined,
-              }];
+              return [
+                {
+                  id: t.id || "",
+                  name: t.name || "",
+                  slug: t.slug || "",
+                  color: t.color,
+                  featured: t.featured || false,
+                  description: t.description || "",
+                  created_at: t.created_at,
+                  updated_at: t.updated_at,
+                  _count: undefined,
+                },
+              ];
             }
             return [];
           })
@@ -443,6 +448,7 @@ export const getAllBlogPosts = async (
       "shares_count",
       "created_at",
       "updated_at",
+      "publish_date",
     ];
     const sortColumn = validSortColumns.includes(sort_by) ? sort_by : "id";
     query = query.order(sortColumn, { ascending: sort_order === "asc" });
@@ -1095,13 +1101,11 @@ export const getBlogStats = async (): Promise<ApiResponse<BlogStats>> => {
       await Promise.all([
         supabase
           .from("blog_posts")
-          .select("id, views_count, likes_count, shares_count, is_featured", {
+          .select("id, views_count, likes_count, shares_count, featured", {
             count: "exact",
           }),
         supabase.from("blog_categories").select("id", { count: "exact" }),
-        supabase
-          .from("blog_tags")
-          .select("id, is_featured", { count: "exact" }),
+        supabase.from("blog_tags").select("id, featured", { count: "exact" }),
         supabase.from("blog_comments").select("id", { count: "exact" }),
       ]);
 
@@ -1123,11 +1127,11 @@ export const getBlogStats = async (): Promise<ApiResponse<BlogStats>> => {
       draftPosts: 0,
       archivedPosts: 0,
       scheduledPosts: 0,
-      featuredPosts: posts.filter((p) => p.is_featured).length,
+      featuredPosts: posts.filter((p) => p.featured).length,
       totalCategories: categoriesResult.count || 0,
       activeCategories: categoriesResult.count || 0,
       totalTags: tagsResult.count || 0,
-      featuredTags: tags.filter((t) => t.is_featured).length,
+      featuredTags: tags.filter((t) => t.featured).length,
       totalComments: commentsResult.count || 0,
       approvedComments: commentsResult.count || 0,
       pendingComments: 0,

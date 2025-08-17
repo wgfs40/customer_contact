@@ -35,7 +35,7 @@ const Blog = () => {
   } = useBlog({
     autoLoad: true,
     status: "published", // Solo posts publicados
-    sort_by: "published_date",
+    sort_by: "publish_date",
     sort_order: "desc",
     limit: 12,
   });
@@ -81,7 +81,7 @@ const Blog = () => {
 
   // Posts destacados (solo cuando no hay filtros activos)
   const featuredPosts = useMemo(() => {
-    return posts.filter((post) => post.is_featured);
+    return posts.filter((post) => post.featured);
   }, [posts]);
 
   const formatDate = (dateString: string | null | undefined) => {
@@ -209,7 +209,7 @@ const Blog = () => {
 
                 <div className="space-y-8">
                   <BlogFeaturePosts
-                    featuredPosts={filteredPosts}
+                    featuredPosts={filteredPosts.slice(0, 2)}
                     setSearchTerm={setSearchTerm}
                   />
                 </div>
@@ -246,9 +246,7 @@ const Blog = () => {
                 posts={posts.map((post) => ({
                   categoryId: post.category?.id ?? "",
                 }))}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                updateFilters={updateFilters}
+                selectedCategory={selectedCategory}                                
               />
 
               {/* Popular Posts */}

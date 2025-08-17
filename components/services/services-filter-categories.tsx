@@ -1,17 +1,13 @@
-import { ServiceCategory } from "@/types/home/service";
-import Link from "next/link";
+import { getAllCategories } from "@/lib/blog/blogApi";
+import ServicesFilterClient from "./services-filter-client";
 
-interface ServicesFilterCategoriesProps {
-  categories: ServiceCategory[];
-  selectedCategoryId?: string;
-  currentPath: string;  
-}
+const ServicesFilterCategories = async () => {
+  const categories = await getAllCategories();
 
-const ServicesFilterCategories = ({
-  categories,
-  selectedCategoryId,
-  currentPath,  
-}: ServicesFilterCategoriesProps) => {
+  if (!categories || !categories.data || categories.data.length === 0) {
+    return null;
+  }
+
   return (
     <>
       {/* Filter Categories */}
@@ -20,50 +16,8 @@ const ServicesFilterCategories = ({
           Encuentra el Servicio Perfecto para tu Negocio
         </h2>
 
-        <div className="flex flex-wrap justify-center gap-4">
-          {/* Botón "Todos" */}
-          <Link
-            href={currentPath}
-            className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-md ${
-              !selectedCategoryId
-                ? "bg-[#F9A825] text-white"
-                : "bg-gray-100 text-gray-800 hover:text-white hover:bg-[#F9A825]"
-            }`}
-          >
-            <span>🏢</span>
-            <span>Todos los Servicios</span>
-          </Link>
-
-          {categories.map((category) => {
-            const isSelected = selectedCategoryId === category.slug;
-
-            return (
-              <Link
-                key={category.id}
-                href={`${currentPath}?category=${category.slug}`}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-md ${
-                  isSelected
-                    ? "bg-[#F9A825] text-white"
-                    : "bg-gray-100 text-gray-800 hover:text-white hover:bg-[#F9A825]"
-                }`}
-              >
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
-                {category.services_count && (
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    {category.services_count}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
+        {/* Componente cliente para manejar interacciones */}
+        <ServicesFilterClient categories={categories.data} />
       </div>
     </>
   );

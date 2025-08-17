@@ -7,7 +7,7 @@ export type CommentStatus = "pending" | "approved" | "rejected";
 export type BlogSortBy =
   | "created_at"
   | "updated_at"
-  | "published_date"
+  | "publish_date"
   | "title"
   | "views"
   | "likes";
@@ -28,8 +28,9 @@ export interface BlogPost {
   meta_title?: string;
   meta_description?: string;
   author_id: string;
+  author_name: string;
   category_id?: string;
-  is_featured: boolean;
+  featured: boolean;
   allow_comments: boolean;
   views_count: number;
   likes_count: number;
@@ -90,7 +91,7 @@ export interface CreateBlogPostData {
   meta_description?: string;
   author_id: string;
   category_id?: string;
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
   scheduled_at?: string; // Para posts programados
@@ -106,7 +107,7 @@ export interface UpdateBlogPostData {
   meta_title?: string;
   meta_description?: string;
   category_id?: string;
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
   published_date?: string | null;
@@ -173,7 +174,7 @@ export interface BlogTag {
   slug: string;
   description?: string;
   color?: string; // Color hex para UI
-  is_featured: boolean;
+  featured: boolean;
   created_at: string;
   updated_at: string;
 
@@ -188,7 +189,7 @@ export interface CreateTagData {
   slug?: string;
   description?: string;
   color?: string;
-  is_featured?: boolean;
+  featured?: boolean;
 }
 
 export interface UpdateTagData {
@@ -196,7 +197,7 @@ export interface UpdateTagData {
   slug?: string;
   description?: string;
   color?: string;
-  is_featured?: boolean;
+  featured?: boolean;
 }
 
 // ================================================================
@@ -268,7 +269,7 @@ export interface BlogFilters {
   search?: string;
 
   // Filtros avanzados
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   include_drafts?: boolean;
 
@@ -450,7 +451,7 @@ export interface BlogPostFormData {
   featured_image: string;
 
   // Opciones
-  is_featured: boolean;
+  featured: boolean;
   allow_comments: boolean;
   scheduled_at?: string;
 }

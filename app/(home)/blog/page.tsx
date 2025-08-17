@@ -14,12 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
-import Blog from "@/components/blog/Blog";
+import BlogContent from "@/components/blog/blog-content";
 
 const BlogPage = () => {
   return (
     <div>
-      <Blog />
+      <BlogContent />
     </div>
   );
 };

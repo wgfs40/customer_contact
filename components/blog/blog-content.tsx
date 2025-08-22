@@ -1,18 +1,11 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useTransition,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import { useEffect, useState, useTransition, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import BlogFeaturePosts from "./BlogFeaturePosts";
 import BlogCategories from "./BlogCategories";
 import BlogPostCard from "./blog-post-card";
-import { BlogPostWithDetails } from "@/types/home/blog";
+import { BlogPostWithDetails, BlogCategory } from "@/types/home/blog";
 import {
   getAllBlogPostsAction,
   getAllCategoriesAction,
@@ -24,20 +17,18 @@ interface BlogContentProps {
 }
 
 const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
-  // ✅ Estados optimizados
+  // ✅ Estados simplificados
   const [posts, setPosts] = useState<BlogPostWithDetails[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [postsLoading, setPostsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // ✅ Referencias para evitar re-renders innecesarios
+  // ✅ Referencias para control de flujo
   const categoriesLoadedRef = useRef(false);
   const initialLoadedRef = useRef(false);
-  const lastParamsRef = useRef({
-    category: initialCategory,
-    page: initialPage,
-  });
+  const lastCategoryRef = useRef(initialCategory);
+  const lastPageRef = useRef(initialPage);
 
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -46,9 +37,9 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
   const selectedCategory = searchParams.get("category") || "";
   const currentPage = Number(searchParams.get("page")) || 1;
 
-  // ✅ Cache para categorías (carga solo una vez)
-  const loadCategoriesOnce = useCallback(async () => {
-    if (categoriesLoadedRef.current) return categories;
+  // ✅ Función directa para cargar categorías
+  const loadCategories = async () => {
+    if (categoriesLoadedRef.current) return;
 
     try {
       console.log("🔄 Cargando categorías...");
@@ -58,16 +49,14 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
         setCategories(categoriesResult.data);
         categoriesLoadedRef.current = true;
         console.log("✅ Categorías cargadas:", categoriesResult.data.length);
-        return categoriesResult.data;
       }
     } catch (error) {
       console.error("❌ Error loading categories:", error);
     }
-    return [];
-  }, [categories]);
+  };
 
-  // ✅ Carga de posts ultra-optimizada
-  const loadPosts = useCallback(async (category?: string, page?: number) => {
+  // ✅ Función directa para cargar posts
+  const loadPosts = async (category?: string, page?: number) => {
     const startTime = performance.now();
 
     try {
@@ -96,9 +85,9 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
     } finally {
       setPostsLoading(false);
     }
-  }, []);
+  };
 
-  // ✅ Carga inicial ultra-rápida
+  // ✅ Carga inicial optimizada
   useEffect(() => {
     if (initialLoadedRef.current) return;
 
@@ -107,18 +96,11 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
       setLoading(true);
 
       try {
-        // ✅ Carga en paralelo con Promise.allSettled para mejor rendimiento
-        const [categoriesResult, postsResult] = await Promise.allSettled([
-          loadCategoriesOnce(),
+        // ✅ Carga en paralelo
+        await Promise.all([
+          loadCategories(),
           loadPosts(initialCategory, initialPage),
         ]);
-
-        if (categoriesResult.status === "rejected") {
-          console.warn("Categories load failed:", categoriesResult.reason);
-        }
-        if (postsResult.status === "rejected") {
-          console.warn("Posts load failed:", postsResult.reason);
-        }
 
         const endTime = performance.now();
         console.log(
@@ -133,97 +115,75 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
     };
 
     loadInitialData();
-  }, [loadCategoriesOnce, loadPosts, initialCategory, initialPage]);
+  }, []); // ✅ Sin dependencias - solo se ejecuta una vez
 
-  // ✅ Solo cargar posts cuando realmente cambian los parámetros
+  // ✅ Detectar cambios en parámetros y recargar posts
   useEffect(() => {
     if (!initialLoadedRef.current || loading) return;
 
-    const currentParams = { category: selectedCategory, page: currentPage };
-    const lastParams = lastParamsRef.current;
+    // ✅ Comparación directa simple
+    const categoryChanged = selectedCategory !== lastCategoryRef.current;
+    const pageChanged = currentPage !== lastPageRef.current;
 
-    // ✅ Comparación deep para evitar cargas innecesarias
-    const paramsChanged =
-      currentParams.category !== lastParams.category ||
-      currentParams.page !== lastParams.page;
-
-    if (paramsChanged) {
+    if (categoryChanged || pageChanged) {
       console.log("📊 Parámetros cambiaron:", {
-        from: lastParams,
-        to: currentParams,
+        category: { from: lastCategoryRef.current, to: selectedCategory },
+        page: { from: lastPageRef.current, to: currentPage },
       });
 
       startTransition(() => {
         loadPosts(selectedCategory, currentPage);
-        lastParamsRef.current = currentParams;
+        lastCategoryRef.current = selectedCategory;
+        lastPageRef.current = currentPage;
       });
     }
-  }, [selectedCategory, currentPage, loadPosts, loading]);
+  }, [selectedCategory, currentPage, loading]);
 
-  // ✅ Función para manejar cambios de categoría (ultra-optimizada)
-  const handleCategoryChange = useCallback(
-    (categoryId: string) => {
-      // ✅ Evitar cambios redundantes
-      if (
-        (categoryId === "" && !selectedCategory) ||
-        categoryId === selectedCategory
-      ) {
-        return;
+  // ✅ Función directa para cambio de categoría
+  const handleCategoryChange = (categoryId: string) => {
+    // ✅ Evitar cambios redundantes        
+    if (
+      (categoryId === "" && !selectedCategory) ||
+      categoryId === selectedCategory
+    ) {
+      return;
+    }
+
+    startTransition(() => {
+      const params = new URLSearchParams();
+
+      if (categoryId) {
+        params.set("category", categoryId);
       }
 
-      startTransition(() => {
-        const params = new URLSearchParams();
+      const newUrl = params.toString()
+        ? `${pathname}?${params.toString()}`
+        : pathname;
 
-        if (categoryId) {
-          params.set("category", categoryId);
-        }
-        // No agregar page=1 explícitamente si no es necesario
+      router.push(newUrl, { scroll: false });
+    });
+  };
 
-        const newUrl = params.toString()
-          ? `${pathname}?${params.toString()}`
-          : pathname;
-
-        router.push(newUrl, { scroll: false });
-      });
-    },
-    [selectedCategory, pathname, router]
-  );
-
-  // ✅ Memoización ultra-optimizada con shallow comparison
-  const postsData = useMemo(() => {
-    if (!posts.length) {
-      return {
-        featuredPosts: [],
-        displayPosts: [],
-        hasMorePosts: false,
-        totalPosts: 0,
-      };
-    }
-
-    const featured = posts.filter((post) => post.featured).slice(0, 2);
-    const display = posts.slice(0, 9);
-    const hasMore = posts.length >= 9;
-
-    return {
-      featuredPosts: featured,
-      displayPosts: display,
-      hasMorePosts: hasMore,
-      totalPosts: posts.length,
-    };
-  }, [posts]);
-
-  // ✅ Función de carga de más posts (optimizada)
-  const handleLoadMore = useCallback(() => {
-    const nextPage = Math.floor(postsData.displayPosts.length / 9) + 1;
+  // ✅ Función directa para cargar más
+  const handleLoadMore = () => {
+    const displayedCount = Math.min(posts.length, 9);
+    const nextPage = Math.floor(displayedCount / 9) + 1;
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", nextPage.toString());
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [postsData.displayPosts.length, searchParams, pathname, router]);
+  };
 
-  // ✅ Estados de carga optimizados
+  // ✅ Cálculos inline directos
   const isInitialLoading = loading && !initialLoadedRef.current;
   const isContentLoading = postsLoading || isPending;
+
+  // ✅ Posts procesados directamente
+  const featuredPosts = posts.filter((post) => post.featured).slice(0, 2);
+  const displayPosts = posts.slice(0, 9);
+  const hasMorePosts = posts.length >= 9;
+  const totalPosts = posts.length;
+  const featuredCount = posts.filter((p) => p.featured).length;
 
   // ✅ Early returns optimizados
   if (isInitialLoading) {
@@ -286,26 +246,24 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
-      {/* ✅ Loading bar más sutil y rápido */}
+      {/* ✅ Loading bar */}
       {isContentLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">
-          <div className="h-1 bg-gradient-to-r from-[#F9A825] to-[#FF8F00] animate-pulse">
-            <div className="h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-          </div>
+          <div className="h-1 bg-gradient-to-r from-[#F9A825] to-[#FF8F00] animate-pulse"></div>
         </div>
       )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Main Content */}
         <main className="lg:w-2/3">
-          {/* Featured Posts - solo mostrar si no hay filtro activo */}
-          {!selectedCategory && postsData.featuredPosts.length > 0 && (
+          {/* Featured Posts */}
+          {!selectedCategory && featuredPosts.length > 0 && (
             <section className="mb-12">
               <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
                 <span className="w-1 h-8 bg-[#F9A825] mr-4"></span>
                 Artículos Destacados
               </h2>
-              <BlogFeaturePosts featuredPosts={postsData.featuredPosts} />
+              <BlogFeaturePosts featuredPosts={featuredPosts} />
             </section>
           )}
 
@@ -341,15 +299,13 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
                 )}
               </h2>
 
-              {/* ✅ Contador de resultados */}
               <div className="text-sm text-gray-500">
-                {postsData.totalPosts} artículo
-                {postsData.totalPosts !== 1 ? "s" : ""}
+                {totalPosts} artículo{totalPosts !== 1 ? "s" : ""}
               </div>
             </header>
 
             <div className="space-y-6">
-              {postsData.displayPosts.map((post, index) => (
+              {displayPosts.map((post, index) => (
                 <article
                   key={`${post.id}-${selectedCategory}-${currentPage}`}
                   className={`transition-all duration-200 ${
@@ -370,8 +326,8 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
               ))}
             </div>
 
-            {/* Load more button optimizado */}
-            {postsData.hasMorePosts && (
+            {/* Load more button */}
+            {hasMorePosts && (
               <div className="text-center mt-8">
                 <button
                   onClick={handleLoadMore}
@@ -395,7 +351,7 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
         {/* Sidebar */}
         <aside className="lg:w-1/3">
           <div className="sticky top-8 space-y-8">
-            {/* ✅ Categorías con loading state */}
+            {/* Categorías */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               {categoriesLoadedRef.current ? (
                 <BlogCategories
@@ -411,7 +367,7 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
                   <div className="animate-pulse">
                     <div className="h-4 bg-gray-200 rounded mb-4"></div>
                     <div className="space-y-2">
-                      {[...Array(3)].map((_, i) => (
+                      {[1, 2, 3].map((i) => (
                         <div key={i} className="h-8 bg-gray-200 rounded"></div>
                       ))}
                     </div>
@@ -420,14 +376,14 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
               )}
             </div>
 
-            {/* Stats card ultra-optimizado */}
+            {/* Stats card */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="font-semibold text-gray-800 mb-4">Estadísticas</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total artículos:</span>
                   <span className="font-medium text-[#F9A825]">
-                    {postsData.totalPosts}
+                    {totalPosts}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -439,7 +395,7 @@ const BlogContent = ({ initialCategory, initialPage }: BlogContentProps) => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Destacados:</span>
                   <span className="font-medium text-[#F9A825]">
-                    {postsData.featuredPosts.length}
+                    {featuredCount}
                   </span>
                 </div>
               </div>

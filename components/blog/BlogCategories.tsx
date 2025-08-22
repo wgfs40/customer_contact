@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import BlogCategoryItem from "./blog-category-item";
+import { BlogCategory } from "@/types/home/blog";
 
 interface BlogCategoriesProps {
-  categories: any[];
+  categories: BlogCategory[];
   posts: { categoryId: string }[];
   selectedCategory: string;
   onCategoryChange: (categoryId: string) => void;

@@ -18,14 +18,13 @@ const BlogCategoryItem = ({
   selectedCategory,
   onCategoryChange,
 }: BlogCategoriesProps) => {
-  const isSelected =
-    selectedCategory === category.id || selectedCategory === category.slug;
+  const isSelected = selectedCategory === category.id;
   const postCount = posts.filter(
     (post) => post.categoryId === category.id
   ).length;
 
   const handleClick = () => {
-    onCategoryChange(isSelected ? "" : category.slug || category.id);
+    onCategoryChange(isSelected ? "" : category.id);
   };
 
   return (

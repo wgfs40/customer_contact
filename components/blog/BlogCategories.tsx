@@ -1,63 +1,60 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import BlogCategoryItem from "./blog-category-item";
+
 interface BlogCategoriesProps {
-  categories: { id: string; name: string; _count?: { posts: number } }[];
+  categories: any[];
   posts: { categoryId: string }[];
   selectedCategory: string;
+  onCategoryChange: (categoryId: string) => void;
 }
 
 const BlogCategories = ({
   categories,
   posts,
   selectedCategory,
+  onCategoryChange,
 }: BlogCategoriesProps) => {
   return (
-    <div>
-      {" "}
-      {/* Categories */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-          <span className="w-1 h-6 bg-[#F9A825] mr-3"></span>
-          Categorías
-        </h3>
-        <div className="space-y-2">
-          <button
-            className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
-              "all" === "all"
-                ? "bg-[#F9A825] text-white shadow-md"
-                : "text-gray-700 hover:bg-[#F9A825]/10"
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h3 className="font-semibold text-gray-800 mb-4 flex items-center">
+        <span className="w-1 h-4 bg-[#F9A825] mr-2"></span>
+        Categorías
+      </h3>
+
+      <div className="space-y-2">
+        {/* Opción "Todas" */}
+        <button
+          onClick={() => onCategoryChange("")}
+          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
+            !selectedCategory
+              ? "bg-[#F9A825] text-white shadow-md"
+              : "hover:bg-[#F9A825]/10 text-gray-700 hover:text-[#F9A825]"
+          }`}
+        >
+          <span className="font-medium">Todas las categorías</span>
+          <span
+            className={`text-xs px-2 py-1 rounded-full ${
+              !selectedCategory
+                ? "bg-white/20 text-white"
+                : "bg-gray-200 text-gray-600"
             }`}
           >
-            <span>Todas las categorías</span>
-            <span
-              className={`text-sm px-2 py-1 rounded-full ${
-                selectedCategory === "all" ? "bg-white/20" : "bg-gray-200"
-              }`}
-            >
-              {posts.length}
-            </span>
-          </button>
+            {posts.length}
+          </span>
+        </button>
 
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex justify-between items-center ${
-                selectedCategory === category.id
-                  ? "bg-[#F9A825] text-white shadow-md"
-                  : "text-gray-700 hover:bg-[#F9A825]/10"
-              }`}
-            >
-              <span>{category.name}</span>
-              <span
-                className={`text-sm px-2 py-1 rounded-full ${
-                  selectedCategory === category.id
-                    ? "bg-white/20"
-                    : "bg-gray-200"
-                }`}
-              >
-                {category._count?.posts || 0}
-              </span>
-            </button>
-          ))}
-        </div>
+        {/* Categorías individuales */}
+        {categories.map((category) => (
+          <BlogCategoryItem
+            key={category.id}
+            category={category}
+            posts={posts}
+            selectedCategory={selectedCategory}
+            onCategoryChange={onCategoryChange}
+          />
+        ))}
       </div>
     </div>
   );

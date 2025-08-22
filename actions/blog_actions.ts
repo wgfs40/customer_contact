@@ -994,7 +994,7 @@ export async function getPublishedPostsAction(): Promise<
   try {
     const filters: BlogFilters = {
       status: "published",
-      sort_by: "published_date",
+      sort_by: "publish_date",
       sort_order: "desc",
     };
 

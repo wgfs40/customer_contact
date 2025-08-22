@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       featured_image: body.featured_image,
       meta_title: body.meta_title,
       meta_description: body.meta_description,
-      is_featured: body.is_featured || false,
+      featured: body.is_featured || false,
       allow_comments: body.allow_comments !== false,
       tags: body.tags || [],
     };

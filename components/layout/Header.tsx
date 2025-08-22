@@ -76,7 +76,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             {/* Logo Container */}
             <div className="relative bg-white rounded-xl p-3 shadow-sm group-hover:shadow-md transition-all duration-300 border border-gray-100">
               <Image
-                src="/images/logo_sin_fondo.png"
+                src="/images/logo.jpg"
                 alt="Dosis de Marketing - Logo"
                 width={50}
                 height={50}
@@ -227,7 +227,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
                 <div className="relative">
                   <div className="bg-gradient-to-br from-[#F9A825]/20 to-[#FF8F00]/20 rounded-lg p-2">
                     <Image
-                      src="/images/logo_sin_fondo.png"
+                      src="/images/logo.jpg"
                       alt="Logo"
                       width={40}
                       height={40}

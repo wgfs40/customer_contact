@@ -1,13 +1,11 @@
 interface ServicesLayoutProps {
-  children: React.ReactNode;
-  modal: React.ReactNode;
+  children: React.ReactNode;  
 }
 
 const ServicesLayout = ({ children }: ServicesLayoutProps) => {
   return (
     <>
-      {children}
-      {/* {modal} */}
+      {children}      
     </>
   );
 };

@@ -361,7 +361,7 @@ export const createBlogPost = async (
       meta_description: postData.meta_description,
       author_id: postData.author_id,
       category_id: postData.category_id,
-      is_featured: postData.is_featured || false,
+      is_featured: postData.featured || false,
       allow_comments: postData.allow_comments !== false,
       scheduled_at: postData.scheduled_at,
     };

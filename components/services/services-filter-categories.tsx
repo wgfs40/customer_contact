@@ -2,7 +2,14 @@ import { getAllCategories } from "@/lib/blog/blogApi";
 import ServicesFilterClient from "./services-filter-client";
 
 const ServicesFilterCategories = async () => {
-  const categories = await getAllCategories();
+  let categories;
+  try {
+    categories = await getAllCategories();
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return null;
+  }
+  
 
   if (!categories || !categories.data || categories.data.length === 0) {
     return null;

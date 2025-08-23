@@ -11,6 +11,7 @@ import {
   BlogStats,
   CreateCommentData,
 } from "@/types/home/blog";
+import { cache } from "react";
 
 // ================================================================
 // CONFIGURACIÓN DE SUPABASE
@@ -725,57 +726,77 @@ export const deleteBlogPost = async (id: string): Promise<ApiResponse> => {
 // CATEGORÍAS
 // ================================================================
 
-export const getAllCategories = async (): Promise<
-  ApiResponse<BlogCategory[]>
-> => {
-  try {
-    console.log("[getAllCategories] Obteniendo categorías");
 
-    const { data, error } = await supabase
-      .from("blog_categories")
-      .select("*")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true });
+export const getAllCategories = cache(
+  async (): Promise<ApiResponse<BlogCategory[]>> => {
+    try {
+      console.log("[getAllCategories] Obteniendo categorías");
 
-    if (error) {
-      console.error("[getAllCategories] Error:", error);
+      // Obtener categorías activas
+      const { data: categories, error } = await supabase
+        .from("blog_categories")
+        .select("id, name, slug, sort_order, is_active, created_at, updated_at")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+
+      if (error) {
+        console.error("[getAllCategories] Error:", error);
+        const baseError = handleSupabaseError(error, "getAllCategories");
+        return {
+          ...baseError,
+          data: [],
+        };
+      }
+
+      // Obtener conteo de posts por categoría en una sola consulta
+      const { data: postCounts, error: countError } = await supabase
+        .from("blog_posts")
+        .select("category_id, count:category_id(*)");
+        
+
+      if (countError) {
+        console.error("[getAllCategories] Error al contar posts:", countError);
+      }
+
+      // Mapear conteos a las categorías
+      const processedData =
+        categories?.map((category) => {
+          const countEntry = postCounts?.find(
+            (c) => c.category_id === category.id
+          );
+          // Asegurarse que countEntry?.count es un número
+          const postCount =
+            typeof countEntry?.count === "number"
+              ? countEntry.count
+              : 0;
+
+          return {
+            ...category,
+            is_active: category.is_active ?? true,
+            created_at: category.created_at ?? null,
+            updated_at: category.updated_at ?? null,
+            _count: {
+              posts: postCount,
+              published_posts: postCount,
+            },
+          };
+        }) || [];
+
+      return {
+        success: true,
+        data: processedData,
+      };
+    } catch (error) {
+      console.error("[getAllCategories] Error inesperado:", error);
       const baseError = handleSupabaseError(error, "getAllCategories");
       return {
         ...baseError,
         data: [],
       };
     }
-
-    // Procesar datos para incluir conteo de posts
-    const processedData = [];
-    for (const category of data || []) {
-      const { count } = await supabase
-        .from("blog_posts")
-        .select("*", { count: "exact", head: true })
-        .eq("category_id", category.id);
-
-      processedData.push({
-        ...category,
-        _count: {
-          posts: count || 0,
-          published_posts: count || 0,
-        },
-      });
-    }
-
-    return {
-      success: true,
-      data: processedData,
-    };
-  } catch (error) {
-    console.error("[getAllCategories] Error inesperado:", error);
-    const baseError = handleSupabaseError(error, "getAllCategories");
-    return {
-      ...baseError,
-      data: [],
-    };
   }
-};
+);
+
 
 export const createCategory = async (
   categoryData: Omit<BlogCategory, "id">

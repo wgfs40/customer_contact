@@ -1,5 +1,7 @@
-import BlogContent from "@/components/blog/blog-content";
+import BlogCategory from "@/components/blog/blog-category";
+import BlogPost from "@/components/blog/blog-post";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Blog | Dosis de Marketing",
@@ -26,23 +28,10 @@ const BlogPage = async ({
   const page = Number(resolvedSearchParams?.page) || 1;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Blog de Marketing Digital
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Insights, estrategias y tendencias para hacer crecer tu negocio
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Componente cliente que maneja la navegación */}
-      <BlogContent initialCategory={selectedCategory} initialPage={page} />
+    <div className="flex flex-col lg:flex-row gap-8">
+      <Suspense fallback={<div>Cargando publicaciones...</div>}>
+        <BlogPost category={selectedCategory} page={page} />
+      </Suspense>
     </div>
   );
 };

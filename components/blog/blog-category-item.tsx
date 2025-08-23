@@ -1,30 +1,23 @@
 "use client";
 
+import { BlogCategory } from "@/types/home/blog";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 interface BlogCategoriesProps {
-  category: {
-    id: string;
-    name: string;
-    slug?: string;
-    _count?: { posts: number };
-  };
-  posts: { categoryId: string }[];
-  selectedCategory: string;
-  onCategoryChange: (categoryId: string) => void;
+  category: BlogCategory;
 }
 
-const BlogCategoryItem = ({
-  category,
-  posts,
-  selectedCategory,
-  onCategoryChange,
-}: BlogCategoriesProps) => {
-  const isSelected = selectedCategory === category.id;
-  const postCount = posts.filter(
-    (post) => post.categoryId === category.id
-  ).length;
+const BlogCategoryItem = ({ category }: BlogCategoriesProps) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
+  const selectedCategory = searchParams?.get("category") || "";
+  const isSelected = selectedCategory === category.id;
   const handleClick = () => {
-    onCategoryChange(isSelected ? "" : category.id);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("category", category.id);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   return (
@@ -37,14 +30,6 @@ const BlogCategoryItem = ({
       }`}
     >
       <span className="font-medium">{category.name}</span>
-
-      <span
-        className={`text-xs px-2 py-1 rounded-full ${
-          isSelected ? "bg-white/20 text-white" : "bg-gray-200 text-gray-600"
-        }`}
-      >
-        {category._count?.posts || postCount || 0}
-      </span>
     </button>
   );
 };

@@ -1,13 +1,12 @@
 "use client";
 
-
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useDeferredValue, useTransition } from "react";
 import ServicesCategoryItems from "./services-category-items";
-import { ServiceCategory } from "@/types/home/service";
+import { BlogCategory } from "@/types/home/blog";
 
 interface ServicesFilterClientProps {
-  categories: ServiceCategory[];
+  categories: BlogCategory[];
 }
 
 const ServicesFilterClient = ({ categories }: ServicesFilterClientProps) => {
@@ -17,32 +16,30 @@ const ServicesFilterClient = ({ categories }: ServicesFilterClientProps) => {
   const router = useRouter();
 
   const selectedCategoryId = searchParams.get("category") || "";
+  const deferredCategories = useDeferredValue(categories);
 
-  // Función para limpiar todos los filtros
-  const clearAllFilters = useCallback(() => {
+  // Limpiar filtros
+  function clearAllFilters() {
     startTransition(() => {
       router.push(pathname, { scroll: false });
     });
-  }, [pathname, router]);
+  }
 
-  // Función para manejar selección de categoría
-  const handleCategorySelect = useCallback((categorySlug: string) => {
+  // Seleccionar categoría
+  function handleCategorySelect(categorySlug: string) {
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
-      
+
       if (categorySlug) {
         params.set("category", categorySlug);
       } else {
         params.delete("category");
       }
 
-      const newUrl = params.toString() 
-        ? `${pathname}?${params.toString()}` 
-        : pathname;
-      
+      const newUrl = params.toString() ? `${pathname}?${params}` : pathname;
       router.push(newUrl, { scroll: false });
     });
-  }, [searchParams, pathname, router]);
+  }
 
   return (
     <>
@@ -51,6 +48,8 @@ const ServicesFilterClient = ({ categories }: ServicesFilterClientProps) => {
         <button
           onClick={clearAllFilters}
           disabled={isPending}
+          aria-busy={isPending}
+          aria-disabled={isPending}
           className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 shadow-md transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
             !selectedCategoryId
               ? "bg-[#F9A825] text-white shadow-lg scale-105"
@@ -66,9 +65,9 @@ const ServicesFilterClient = ({ categories }: ServicesFilterClientProps) => {
         </button>
 
         {/* Categorías individuales */}
-        {categories.map((category) => (
-          <ServicesCategoryItems 
-            key={category.id} 
+        {deferredCategories.map((category) => (
+          <ServicesCategoryItems
+            key={category.id}
             category={category}
             onCategorySelect={handleCategorySelect}
           />
@@ -81,7 +80,8 @@ const ServicesFilterClient = ({ categories }: ServicesFilterClientProps) => {
           <div className="inline-flex items-center gap-2 bg-[#F9A825]/10 text-[#F9A825] px-4 py-2 rounded-lg">
             <span>Filtrando por:</span>
             <span className="font-semibold capitalize">
-              {categories.find(cat => cat.slug === selectedCategoryId)?.name || selectedCategoryId.replace("-", " ")}
+              {deferredCategories.find((cat) => cat.slug === selectedCategoryId)
+                ?.name || selectedCategoryId.replace("-", " ")}
             </span>
             <button
               onClick={clearAllFilters}

@@ -37,8 +37,10 @@ const ServicePage = async ({
         <ServicesHero />
 
         <div className="max-w-7xl mx-auto px-4 py-16">
-          {/* Filtros de categorías */}
-          <ServicesFilterCategories />
+          <Suspense fallback={<ServicesPageSkeleton />}>
+            {/* Filtros de categorías */}
+            <ServicesFilterCategories />
+          </Suspense>
 
           <Suspense
             key={query + page + category}

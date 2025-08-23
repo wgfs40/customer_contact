@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import UserTable from "./UserTable";
+import { getStatusColor } from "@/lib/admin/status-color";
 
 interface UsersManagementProps {
   users: Array<{
@@ -11,11 +12,10 @@ interface UsersManagementProps {
     role: string;
     status: string;
     lastLogin: string;
-  }>;
-  getStatusColor: (status: string) => string;
+  }>;  
 }
 
-const UsersManagement = ({ users, getStatusColor }: UsersManagementProps) => {
+const UsersManagement = ({ users }: UsersManagementProps) => {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const handleUserSelect = (userId: number) => {
     setSelectedUsers((prev) =>

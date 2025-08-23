@@ -447,7 +447,6 @@ export const getAllBlogPosts = async (
       "views_count",
       "likes_count",
       "shares_count",
-      "created_at",
       "updated_at",
       "publish_date",
     ];
@@ -726,7 +725,6 @@ export const deleteBlogPost = async (id: string): Promise<ApiResponse> => {
 // CATEGORÍAS
 // ================================================================
 
-
 export const getAllCategories = cache(
   async (): Promise<ApiResponse<BlogCategory[]>> => {
     try {
@@ -752,7 +750,6 @@ export const getAllCategories = cache(
       const { data: postCounts, error: countError } = await supabase
         .from("blog_posts")
         .select("category_id, count:category_id(*)");
-        
 
       if (countError) {
         console.error("[getAllCategories] Error al contar posts:", countError);
@@ -766,9 +763,7 @@ export const getAllCategories = cache(
           );
           // Asegurarse que countEntry?.count es un número
           const postCount =
-            typeof countEntry?.count === "number"
-              ? countEntry.count
-              : 0;
+            typeof countEntry?.count === "number" ? countEntry.count : 0;
 
           return {
             ...category,
@@ -796,7 +791,6 @@ export const getAllCategories = cache(
     }
   }
 );
-
 
 export const createCategory = async (
   categoryData: Omit<BlogCategory, "id">

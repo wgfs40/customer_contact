@@ -1,5 +1,6 @@
-import BlogCategory from "@/components/blog/blog-category";
 import BlogPost from "@/components/blog/blog-post";
+import BlogPostSkeleton from "@/components/customs/loading/blog-post-skeleton";
+
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -29,7 +30,10 @@ const BlogPage = async ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
-      <Suspense fallback={<div>Cargando publicaciones...</div>}>
+      <Suspense
+        key={selectedCategory + page}
+        fallback={<BlogPostSkeleton count={3} />}
+      >
         <BlogPost category={selectedCategory} page={page} />
       </Suspense>
     </div>

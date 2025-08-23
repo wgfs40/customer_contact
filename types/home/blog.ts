@@ -7,7 +7,7 @@ export type CommentStatus = "pending" | "approved" | "rejected";
 export type BlogSortBy =
   | "created_at"
   | "updated_at"
-  | "published_at"
+  | "publish_date"
   | "title"
   | "views"
   | "likes";
@@ -28,14 +28,15 @@ export interface BlogPost {
   meta_title?: string;
   meta_description?: string;
   author_id: string;
+  author_name: string;
   category_id?: string;
-  is_featured: boolean;
+  featured: boolean;
   allow_comments: boolean;
-  views: number;
-  likes: number;
-  shares: number;
+  views_count: number;
+  likes_count: number;
+  shares_count: number;
   reading_time?: number; // en minutos
-  published_at?: string;
+  publish_date?: string;
   scheduled_at?: string;
   created_at: string;
   updated_at: string;
@@ -56,11 +57,11 @@ export interface BlogPostWithDetails extends BlogPost {
 
   // Estadísticas extendidas
   _count?: {
-    views: number;
-    likes: number;
-    shares: number;
-    comments: number;
-    approved_comments: number;
+    views_count: number;
+    likes_count: number;
+    shares_count: number;
+    comments_count: number;
+    approved_comments_count: number;
   };
 
   // Datos adicionales
@@ -90,7 +91,7 @@ export interface CreateBlogPostData {
   meta_description?: string;
   author_id: string;
   category_id?: string;
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
   scheduled_at?: string; // Para posts programados
@@ -106,10 +107,10 @@ export interface UpdateBlogPostData {
   meta_title?: string;
   meta_description?: string;
   category_id?: string;
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
-  published_at?: string | null;
+  published_date?: string | null;
   scheduled_at?: string | null;
 }
 
@@ -173,7 +174,7 @@ export interface BlogTag {
   slug: string;
   description?: string;
   color?: string; // Color hex para UI
-  is_featured: boolean;
+  featured: boolean;
   created_at: string;
   updated_at: string;
 
@@ -188,7 +189,7 @@ export interface CreateTagData {
   slug?: string;
   description?: string;
   color?: string;
-  is_featured?: boolean;
+  featured?: boolean;
 }
 
 export interface UpdateTagData {
@@ -196,7 +197,7 @@ export interface UpdateTagData {
   slug?: string;
   description?: string;
   color?: string;
-  is_featured?: boolean;
+  featured?: boolean;
 }
 
 // ================================================================
@@ -268,7 +269,7 @@ export interface BlogFilters {
   search?: string;
 
   // Filtros avanzados
-  is_featured?: boolean;
+  featured?: boolean;
   allow_comments?: boolean;
   include_drafts?: boolean;
 
@@ -410,7 +411,7 @@ export interface BlogMetrics {
 // RESPUESTAS DE API
 // ================================================================
 
-export interface BlogApiResponse<T = any> {
+export interface BlogApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -450,7 +451,7 @@ export interface BlogPostFormData {
   featured_image: string;
 
   // Opciones
-  is_featured: boolean;
+  featured: boolean;
   allow_comments: boolean;
   scheduled_at?: string;
 }
@@ -559,44 +560,3 @@ export interface BlogSearchFilters {
   };
   content_type?: "posts" | "categories" | "tags" | "all";
 }
-
-// ================================================================
-// EXPORTAR TIPOS PRINCIPALES
-// ================================================================
-
-export type {
-  // Principales
-  BlogPost,
-  BlogPostWithDetails,
-  CreateBlogPostData,
-  UpdateBlogPostData,
-  BlogCategory,
-  BlogTag,
-  BlogComment,
-  CreateCommentData,
-  BlogFilters,
-  BlogStats,
-
-  // Adicionales
-  BlogMetrics,
-  BlogApiResponse,
-  PaginatedBlogResponse,
-  BlogPostFormData,
-  CommentFormData,
-  UseBlogPostsReturn,
-  BlogSearchResult,
-};
-
-// Exports por defecto para facilitar imports
-export default {
-  BlogPost,
-  BlogPostWithDetails,
-  CreateBlogPostData,
-  UpdateBlogPostData,
-  BlogCategory,
-  BlogTag,
-  BlogComment,
-  CreateCommentData,
-  BlogFilters,
-  BlogStats,
-};

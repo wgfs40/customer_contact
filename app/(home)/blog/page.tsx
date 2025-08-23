@@ -1,27 +1,41 @@
-"use client";
-import Head from "next/head";
-<Head>
-  <title>Blog | Dosis de Marketing</title>
-  <meta
-    name="description"
-    content="Descubre las últimas tendencias en marketing digital, branding y desarrollo web."
-  />
-  <meta name="robots" content="index, follow" />
-  <meta property="og:title" content="Blog | Dosis de Marketing" />
-  <meta
-    property="og:description"
-    content="Descubre las últimas tendencias en marketing digital, branding y desarrollo web."
-  />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="/images/og-image.jpg" />
-  <meta property="og:url" content="https://dosisdemarketing.com/blog" />
-</Head>;
-import Blog from "@/components/blog/Blog";
+import BlogPost from "@/components/blog/blog-post";
+import BlogPostSkeleton from "@/components/customs/loading/blog-post-skeleton";
 
-const BlogPage = () => {
+import { Metadata } from "next";
+import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Blog | Dosis de Marketing",
+  description:
+    "Descubre las últimas tendencias en marketing digital, branding y desarrollo web.",
+  robots: "index, follow",
+  openGraph: {
+    title: "Blog | Dosis de Marketing",
+    description:
+      "Descubre las últimas tendencias en marketing digital, branding y desarrollo web.",
+    images: ["/images/logo.jpg"],
+    url: "https://dosisdemarketing.com/blog",
+  },
+};
+
+const BlogPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string | null; page?: string }>;
+}) => {
+  // Await searchParams para Next.js 15+
+  const resolvedSearchParams = await searchParams;
+  const selectedCategory = resolvedSearchParams?.category || "";
+  const page = Number(resolvedSearchParams?.page) || 1;
+
   return (
-    <div>
-      <Blog />
+    <div className="flex flex-col lg:flex-row gap-8">
+      <Suspense
+        key={selectedCategory + page}
+        fallback={<BlogPostSkeleton count={3} />}
+      >
+        <BlogPost category={selectedCategory} page={page} />
+      </Suspense>
     </div>
   );
 };

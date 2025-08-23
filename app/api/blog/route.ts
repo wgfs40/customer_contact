@@ -23,12 +23,7 @@ export async function GET(request: NextRequest) {
       tag: searchParams.get("tag") || undefined,
       search: searchParams.get("search") || undefined,
       sort_by:
-        (searchParams.get("sort_by") as
-          | "created_at"
-          | "title"
-          | "updated_at"
-          | "status"
-          | undefined) || "created_at",
+        (searchParams.get("sort_by") as BlogFilters["sort_by"]) || "created_at",
       sort_order:
         (searchParams.get("sort_order") as "asc" | "desc" | undefined) ||
         "desc",
@@ -85,7 +80,7 @@ export async function POST(request: NextRequest) {
       featured_image: body.featured_image,
       meta_title: body.meta_title,
       meta_description: body.meta_description,
-      is_featured: body.is_featured || false,
+      featured: body.is_featured || false,
       allow_comments: body.allow_comments !== false,
       tags: body.tags || [],
     };

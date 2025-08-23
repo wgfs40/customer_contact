@@ -1,11 +1,6 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
 
 const About = () => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-
   const skills = [
     { name: "Marketing Digital", percentage: 95 },
     { name: "Estrategia de Contenido", percentage: 90 },
@@ -71,10 +66,8 @@ const About = () => {
                     alt="Marisol - Experta en Marketing Digital"
                     fill
                     style={{ objectFit: "cover", objectPosition: "center top" }}
-                    className={`transition-all duration-1000 group-hover:scale-105 ${
-                      imageLoaded ? "scale-100 blur-0" : "scale-105 blur-sm"
-                    }`}
-                    onLoad={() => setImageLoaded(true)}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className={`transition-all duration-1000 group-hover:scale-105                    }`}
                     priority
                   />
 

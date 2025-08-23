@@ -41,6 +41,7 @@ export default function RootLayout({
       <html
         lang="es"
         className={`${inter.variable} ${poppins.variable} ${montserrat.variable} font-smooth`}
+        suppressHydrationWarning
       >
         <body className="antialiased">{children}</body>
       </html>

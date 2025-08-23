@@ -2,8 +2,18 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import blogApi from "@/lib/blog/blogApi";
-import { BlogCategory, BlogComment, BlogFilters, BlogPost, BlogPostWithDetails, BlogStats, BlogTag, CreateBlogPostData, CreateCommentData, UpdateBlogPostData } from "@/types/home/blog";
-
+import {
+  BlogCategory,
+  BlogComment,
+  BlogFilters,
+  BlogPost,
+  BlogPostWithDetails,
+  BlogStats,
+  BlogTag,
+  CreateBlogPostData,
+  CreateCommentData,
+  UpdateBlogPostData,
+} from "@/types/home/blog";
 
 // ================================================================
 // TIPOS DE RESPUESTA
@@ -105,7 +115,7 @@ export async function getAllBlogPostsAction(
         error: result.error || "Error al obtener los posts",
       };
     }
-
+   
     return {
       success: true,
       data: result.data || [],
@@ -322,7 +332,7 @@ export async function publishBlogPostAction(
 
     const updateData: UpdateBlogPostData = {
       status: "published",
-      published_at: new Date().toISOString(),
+      published_date: new Date().toISOString(),
     };
 
     const result = await updateBlogPostAction(id, updateData);
@@ -353,7 +363,7 @@ export async function unpublishBlogPostAction(
 
     const updateData: UpdateBlogPostData = {
       status: "draft",
-      published_at: null,
+      published_date: null,
     };
 
     const result = await updateBlogPostAction(id, updateData);
@@ -410,7 +420,7 @@ export async function getAllCategoriesAction(): Promise<
 }
 
 export async function createCategoryAction(
-  categoryData: Omit<BlogCategory, "id" | "created_at" | "updated_at">
+  categoryData: Omit<BlogCategory, "id">
 ): Promise<ActionResponse<BlogCategory>> {
   try {
     console.log("[createCategoryAction] Creando categoría:", categoryData.name);
@@ -487,7 +497,7 @@ export async function getAllTagsAction(): Promise<ActionResponse<BlogTag[]>> {
 }
 
 export async function createTagAction(
-  tagData: Omit<BlogTag, "id" | "created_at" | "updated_at">
+  tagData: Omit<BlogTag, "id">
 ): Promise<ActionResponse<BlogTag>> {
   try {
     console.log("[createTagAction] Creando tag:", tagData.name);
@@ -984,7 +994,7 @@ export async function getPublishedPostsAction(): Promise<
   try {
     const filters: BlogFilters = {
       status: "published",
-      sort_by: "published_at",
+      sort_by: "publish_date",
       sort_order: "desc",
     };
 

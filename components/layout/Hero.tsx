@@ -1,7 +1,6 @@
 "use client";
 
 import ImageCarousel from "@/components/layout/ImageCarousel";
-import ServicesGrid from "../services/ServicesGrid";
 
 const Hero = () => {
   return (
@@ -71,7 +70,11 @@ const Hero = () => {
             </p>
           </div>
 
-          <ServicesGrid />
+          {/* <ServicesGrid
+            services={filteredServices}
+            isLoading={isLoadingServices}
+            openServiceModal={openServiceModal}
+          /> */}
 
           {/* Call to Action */}
           <div className="text-center mt-12">

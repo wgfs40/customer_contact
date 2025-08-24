@@ -14,6 +14,7 @@ import {
   CreateCommentData,
   UpdateBlogPostData,
 } from "@/types/home/blog";
+import { randomUUID } from "crypto";
 
 // ================================================================
 // TIPOS DE RESPUESTA
@@ -51,13 +52,26 @@ export async function createBlogPostAction(
       };
     }
 
-    if (!postData.author_id) {
+    //solo permitir como minimo 50 caracteres o mas
+    if (!postData.excerpt || postData.excerpt.length < 50) {
       return {
         success: false,
-        error: "El autor del post es requerido",
+        error: "El contenido del post debe tener al menos 50 caracteres",
       };
     }
 
+    //agregar un author default
+    // generar id con uuid
+    postData.author_id = randomUUID();
+    postData.author_name = postData.author_name || "Marisol Muñoz";
+    // if (!postData.author_id) {
+    //   return {
+    //     success: false,
+    //     error: "El autor del post es requerido",
+    //   };
+    // }
+
+    console.log("[createBlogPostAction] Datos del post a crear:", postData);
     // Crear el post
     const result = await blogApi.createBlogPost(postData);
 
@@ -115,7 +129,7 @@ export async function getAllBlogPostsAction(
         error: result.error || "Error al obtener los posts",
       };
     }
-   
+
     return {
       success: true,
       data: result.data || [],

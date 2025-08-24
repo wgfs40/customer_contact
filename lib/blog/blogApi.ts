@@ -357,15 +357,16 @@ export const createBlogPost = async (
       content: postData.content,
       excerpt: postData.excerpt,
       slug,
-      featured_image: postData.featured_image,
+      image_url: postData.image_url,
       meta_title: postData.meta_title,
       meta_description: postData.meta_description,
       author_id: postData.author_id,
+      author_name: postData.author_name,
       category_id: postData.category_id,
-      is_featured: postData.featured || false,
-      allow_comments: postData.allow_comments !== false,
-      scheduled_at: postData.scheduled_at,
+      featured: postData.featured || false,
     };
+
+    console.log("Blog post a crear:", blogPost);
 
     const { data, error } = await supabase
       .from("blog_posts")
@@ -381,7 +382,7 @@ export const createBlogPost = async (
     }
 
     // Si hay tags, asociarlos
-    if (postData.tags && postData.tags.length > 0) {
+    if (Array.isArray(postData.tags) && postData.tags.length > 0) {
       const tagRelations = postData.tags.map((tagId) => ({
         post_id: data.id,
         tag_id: tagId,

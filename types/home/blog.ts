@@ -24,7 +24,7 @@ export interface BlogPost {
   content: string;
   excerpt?: string;
   status: BlogPostStatus;
-  featured_image?: string;
+  image_url?: string;
   meta_title?: string;
   meta_description?: string;
   author_id: string;
@@ -86,15 +86,14 @@ export interface CreateBlogPostData {
   excerpt?: string;
   slug?: string; // Si no se proporciona, se genera automáticamente
   status?: BlogPostStatus;
-  featured_image?: string;
+  image_url?: string;
   meta_title?: string;
   meta_description?: string;
   author_id: string;
+  author_name: string;
   category_id?: string;
   featured?: boolean;
-  allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
-  scheduled_at?: string; // Para posts programados
 }
 
 export interface UpdateBlogPostData {
@@ -103,15 +102,13 @@ export interface UpdateBlogPostData {
   excerpt?: string;
   slug?: string;
   status?: BlogPostStatus;
-  featured_image?: string;
+  image_url?: string;
   meta_title?: string;
   meta_description?: string;
   category_id?: string;
   featured?: boolean;
-  allow_comments?: boolean;
   tags?: string[]; // Array de IDs de tags
   published_date?: string | null;
-  scheduled_at?: string | null;
 }
 
 // ================================================================
@@ -448,7 +445,7 @@ export interface BlogPostFormData {
   // SEO
   meta_title: string;
   meta_description: string;
-  featured_image: string;
+  image_url: string;
 
   // Opciones
   featured: boolean;

@@ -1,4 +1,4 @@
-import { getAllCategoriesAction } from "@/actions/blog_actions";
+import { getAllCategoriesAction, getBlogPostByIdAction } from "@/actions/blog_actions";
 import PostsAdminClient from "./post-admin-client";
 import { PostsAdminHeader } from "./post-admin-header";
 import { PostsAdminForm } from "./post-admin-form";
@@ -44,9 +44,8 @@ async function getCategories(): Promise<Category[]> {
 async function getExistingPost(id: string): Promise<BlogPost | null> {
   try {
     // TODO: Implement getBlogPostByIdAction
-    // const postResult = await getBlogPostByIdAction(id);
-    // return postResult?.data as BlogPost;
-    return null;
+     const postResult = await getBlogPostByIdAction(id);
+     return postResult?.data as BlogPost;   
   } catch (error) {
     console.error("Error fetching post:", error);
     return null;

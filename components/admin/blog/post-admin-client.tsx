@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, ReactNode, useCallback, useMemo } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { createBlogPostAction } from "@/actions/blog_actions";
 
 // Types
 interface FormData {
@@ -66,6 +67,40 @@ const calculateStats = (text: string) => {
   return { words, chars, readTime };
 };
 
+const formatOptions = {
+  bold: (text: string) => `**${text}**`,
+  italic: (text: string) => `*${text}*`,
+  h1: (text: string) => `# ${text}`,
+  h2: (text: string) => `## ${text}`,
+  h3: (text: string) => `### ${text}`,
+  list: (text: string) => `- ${text}`,
+  link: (text: string) => `[${text}](https://)`,
+  quote: (text: string) => `> ${text}`,
+};
+
+// Helper functions
+const updateElement = (id: string, value: string) => {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+};
+
+const getElementValue = (id: string): string => {
+  const element = document.getElementById(id) as
+    | HTMLInputElement
+    | HTMLTextAreaElement;
+  return element?.value || "";
+};
+
+const validateFileSize = (file: File, maxSizeMB: number = 5): boolean => {
+  return file.size <= maxSizeMB * 1024 * 1024;
+};
+
+const createFileReader = (onLoad: (result: string) => void): FileReader => {
+  const reader = new FileReader();
+  reader.onload = (e) => onLoad(e.target?.result as string);
+  return reader;
+};
+
 // Sub-components
 const Tag = ({
   tag,
@@ -87,7 +122,7 @@ const Tag = ({
   </span>
 );
 
-const ImageUpload = ({
+const ImageUploadComponent = ({
   imagePreview,
   onImageChange,
   onImageRemove,
@@ -111,6 +146,7 @@ const ImageUpload = ({
             width={300}
             height={200}
             className="w-full h-48 object-cover rounded-xl"
+            priority
           />
           <button
             type="button"
@@ -165,7 +201,7 @@ const ImageUpload = ({
   </div>
 );
 
-const TagsManager = ({
+const TagsManagerComponent = ({
   tags,
   tagInput,
   onTagInputChange,
@@ -192,6 +228,7 @@ const TagsManager = ({
         onKeyDown={onAddTag}
         placeholder="Escribe una etiqueta y presiona Enter"
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F9A825]/50 focus:border-[#F9A825] transition-colors"
+        maxLength={30}
       />
 
       {tags.length > 0 && (
@@ -201,6 +238,8 @@ const TagsManager = ({
           ))}
         </div>
       )}
+
+      <p className="text-xs text-gray-500">{tags.length}/10 etiquetas</p>
     </div>
   </div>
 );
@@ -214,7 +253,9 @@ const PostsAdminClient = ({
   isEditing = false,
 }: PostsAdminClientProps) => {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+
+  // State
+  const [formData, setFormData] = useState<FormData>(() => ({
     title: existingPost?.title || "",
     slug: existingPost?.slug || "",
     excerpt: existingPost?.excerpt || "",
@@ -226,7 +267,7 @@ const PostsAdminClient = ({
     meta_title: existingPost?.meta_title || "",
     meta_description: existingPost?.meta_description || "",
     tags: existingPost?.tags || [],
-  });
+  }));
 
   const [tagInput, setTagInput] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -236,160 +277,262 @@ const PostsAdminClient = ({
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  // Format options
-  const formatOptions = useMemo(
-    () => ({
-      bold: (text: string) => `**${text}**`,
-      italic: (text: string) => `*${text}*`,
-      h1: (text: string) => `# ${text}`,
-      h2: (text: string) => `## ${text}`,
-      h3: (text: string) => `### ${text}`,
-      list: (text: string) => `- ${text}`,
-      link: (text: string) => `[${text}](https://)`,
-      quote: (text: string) => `> ${text}`,
-    }),
-    []
-  );
-
   // Event handlers
-  const updateStats = useCallback(() => {
-    const content =
-      (document.getElementById("content") as HTMLTextAreaElement)?.value || "";
+  const updateStats = () => {
+    const content = getElementValue("content");
     const { words, chars, readTime } = calculateStats(content);
-
-    const updateElement = (id: string, value: string) => {
-      const element = document.getElementById(id);
-      if (element) element.textContent = value;
-    };
 
     updateElement("word-count", words.toString());
     updateElement("char-count", chars.toString());
     updateElement("read-time", `${readTime} min`);
-  }, []);
+  };
 
-  const handleSave = useCallback(
-    async (status: FormData["status"]) => {
-      if (isLoading) return;
+  const updateSeoPreview = () => {
+    const values = {
+      title: getElementValue("title"),
+      metaTitle: getElementValue("meta_title"),
+      slug: getElementValue("slug"),
+      excerpt: getElementValue("excerpt"),
+      metaDescription: getElementValue("meta_description"),
+      content: getElementValue("content"),
+    };
 
-      setIsLoading(true);
-      try {
-        // Get form data
-        const formElement = document.querySelector("form") as HTMLFormElement;
-        if (!formElement) throw new Error("Formulario no encontrado");
+    // Update preview elements
+    const previewTitle = document.getElementById("seo-preview-title");
+    const previewUrl = document.getElementById("seo-preview-url");
+    const previewDescription = document.getElementById(
+      "seo-preview-description"
+    );
 
-        const formDataToSend = new FormData(formElement);
-        formDataToSend.set("status", status);
-        formDataToSend.set("tags", JSON.stringify(formData.tags));
+    if (previewTitle) {
+      previewTitle.textContent =
+        values.metaTitle || values.title || "Título del artículo";
+    }
+    if (previewUrl) {
+      previewUrl.textContent = `tudominio.com › blog › ${
+        values.slug || "url-del-articulo"
+      }`;
+    }
+    if (previewDescription) {
+      previewDescription.textContent =
+        values.metaDescription ||
+        values.excerpt ||
+        "Descripción del artículo que aparecerá en los resultados de búsqueda...";
+    }
 
-        // TODO: Replace with actual API call
-        console.log("Guardando post:", {
-          status,
-          data: Object.fromEntries(formDataToSend),
-        });
+    // Update character counts
+    const metaTitleCount = document.getElementById("meta-title-count");
+    const metaDescCount = document.getElementById("meta-description-count");
 
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (metaTitleCount) {
+      const count = values.metaTitle.length;
+      metaTitleCount.textContent = `${count}/60`;
+      metaTitleCount.className = `text-sm font-medium ${
+        count > 60
+          ? "text-red-500"
+          : count > 50
+          ? "text-yellow-500"
+          : "text-gray-400"
+      }`;
+    }
 
+    if (metaDescCount) {
+      const count = values.metaDescription.length;
+      metaDescCount.textContent = `${count}/160`;
+      metaDescCount.className = `text-sm font-medium ${
+        count > 160
+          ? "text-red-500"
+          : count > 140
+          ? "text-yellow-500"
+          : "text-gray-400"
+      }`;
+    }
+
+    // Update SEO checks
+    updateSeoChecks(values);
+  };
+
+  const updateSeoChecks = (values: any) => {
+    const checks = [
+      {
+        id: "seo-title-check",
+        condition: values.metaTitle.length > 0 && values.metaTitle.length <= 60,
+      },
+      {
+        id: "seo-description-check",
+        condition:
+          values.metaDescription.length > 0 &&
+          values.metaDescription.length <= 160,
+      },
+      {
+        id: "seo-slug-check",
+        condition: values.slug.length > 0,
+      },
+      {
+        id: "seo-content-check",
+        condition:
+          values.content.split(/\s+/).filter((word: string) => word.length > 0)
+            .length >= 300,
+      },
+    ];
+
+    checks.forEach((check) => {
+      const element = document.getElementById(check.id);
+      if (element) {
+        element.className = `w-2 h-2 rounded-full ${
+          check.condition ? "bg-green-500" : "bg-gray-300"
+        }`;
+      }
+    });
+
+    // Update overall score
+    const passedChecks = checks.filter((check) => check.condition).length;
+    const seoScore = document.getElementById("seo-score");
+
+    if (seoScore) {
+      const scoreConfig = {
+        4: { text: "Excelente", class: "text-sm font-medium text-green-600" },
+        3: { text: "Bueno", class: "text-sm font-medium text-yellow-600" },
+        2: { text: "Bueno", class: "text-sm font-medium text-yellow-600" },
+        default: {
+          text: "Mejorable",
+          class: "text-sm font-medium text-red-600",
+        },
+      };
+
+      const config =
+        scoreConfig[passedChecks as keyof typeof scoreConfig] ||
+        scoreConfig.default;
+      seoScore.textContent = config.text;
+      seoScore.className = config.class;
+    }
+  };
+
+  const handleSave = async (status: FormData["status"]) => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const formElement = document.querySelector("form") as HTMLFormElement;
+      if (!formElement) throw new Error("Formulario no encontrado");
+
+      const formDataToSend = new FormData(formElement);
+      formDataToSend.set("status", status);
+      formDataToSend.set("tags", JSON.stringify(formData.tags));
+
+      console.log("Guardando post:", {
+        status,
+        data: Object.fromEntries(formDataToSend),
+      });
+
+      
+      const result = await createBlogPostAction(
+        Object.fromEntries(formDataToSend) as any
+      );
+      console.log("Resultado de la creación del post:", result);
+
+      if (result.success) {
+        
+        alert(
+          `¡Post ${
+            status === "published" ? "publicado" : "guardado"
+          } exitosamente!`
+        );
         if (status === "published") {
           router.push("/admin?tab=posts");
         }
-      } catch (error) {
-        console.error("Error al guardar:", error);
-        alert("Error al guardar el post");
-      } finally {
-        setIsLoading(false);
+      } else {
+        console.error("Error al guardar el post:", result);
+        throw new Error(result.error || "Error al guardar el post");
       }
-    },
-    [formData.tags, isLoading, router]
-  );
+    } catch (error) {
+      console.error("Error al guardar:", error);
+      alert("Error al guardar el post");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleFormat = useCallback(
-    (type: FormatType) => {
-      const textarea = document.getElementById(
-        "content"
-      ) as HTMLTextAreaElement;
-      if (!textarea || !formatOptions[type]) return;
+  const handleFormat = (type: FormatType) => {
+    const textarea = document.getElementById("content") as HTMLTextAreaElement;
+    if (!textarea || !formatOptions[type]) return;
 
-      const { selectionStart: start, selectionEnd: end, value } = textarea;
-      const selectedText = value.substring(start, end);
-      const replacement = formatOptions[type](selectedText);
+    const { selectionStart: start, selectionEnd: end, value } = textarea;
+    const selectedText = value.substring(start, end);
+    const replacement = formatOptions[type](selectedText);
 
-      textarea.setRangeText(replacement, start, end, "end");
-      textarea.focus();
-    },
-    [formatOptions]
-  );
+    textarea.setRangeText(replacement, start, end, "end");
+    textarea.focus();
+  };
 
-  const handleClick = useCallback(async () => {
+  const handleClick = async () => {
     if (isLoading) return;
 
-    switch (action) {
-      case "goBack":
-        router.back();
-        break;
-      case "saveDraft":
-        await handleSave("draft");
-        break;
-      case "publish":
-        await handleSave("published");
-        break;
-      case "format":
-        if (data?.type) handleFormat(data.type);
-        break;
+    const actionHandlers = {
+      goBack: () => router.back(),
+      saveDraft: () => handleSave("draft"),
+      publish: () => handleSave("published"),
+      format: () => data?.type && handleFormat(data.type),
+    };
+
+    const handler = actionHandlers[action as keyof typeof actionHandlers];
+    if (handler) {
+      await handler();
     }
-  }, [action, data, isLoading, router, handleSave, handleFormat]);
+  };
 
-  const handleAddTag = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter" && tagInput.trim()) {
-        e.preventDefault();
-        const newTag = tagInput.trim().toLowerCase();
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim().toLowerCase();
 
-        if (!formData.tags.includes(newTag) && formData.tags.length < 10) {
-          setFormData((prev) => ({ ...prev, tags: [...prev.tags, newTag] }));
-          setTagInput("");
-        }
+      if (!formData.tags.includes(newTag) && formData.tags.length < 10) {
+        setFormData((prev) => ({ ...prev, tags: [...prev.tags, newTag] }));
+        setTagInput("");
       }
-    },
-    [tagInput, formData.tags]
-  );
+    }
+  };
 
-  const handleRemoveTag = useCallback((tagToRemove: string) => {
+  const handleRemoveTag = (tagToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
-  }, []);
+  };
 
-  const handleImageChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("La imagen debe ser menor a 5MB");
-        return;
-      }
+    if (!validateFileSize(file)) {
+      alert("La imagen debe ser menor a 5MB");
+      return;
+    }
 
-      setFormData((prev) => ({ ...prev, featured_image: file }));
+    setFormData((prev) => ({ ...prev, featured_image: file }));
 
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target?.result as string);
-      reader.readAsDataURL(file);
-    },
-    []
-  );
+    const reader = createFileReader((result) => setImagePreview(result));
+    reader.readAsDataURL(file);
+  };
 
-  const handleImageRemove = useCallback(() => {
+  const handleImageRemove = () => {
     setImagePreview(null);
     setFormData((prev) => ({ ...prev, featured_image: null }));
 
-    // Clear file input
     const fileInput = document.querySelector(
       'input[type="file"]'
     ) as HTMLInputElement;
     if (fileInput) fileInput.value = "";
-  }, []);
+  };
+
+  const handleTitleChange = () => {
+    const titleInput = document.getElementById("title") as HTMLInputElement;
+    const slugInput = document.getElementById("slug") as HTMLInputElement;
+
+    if (titleInput && slugInput) {
+      slugInput.value = generateSlug(titleInput.value);
+    }
+  };
 
   // Effects
   useEffect(() => {
@@ -401,18 +544,41 @@ const PostsAdminClient = ({
         return () => contentTextarea.removeEventListener("input", updateStats);
       }
     }
-  }, [action, updateStats]);
+  }, [action]);
+
+  useEffect(() => {
+    if (action === "seoPreview") {
+      const inputIds = [
+        "title",
+        "meta_title",
+        "slug",
+        "excerpt",
+        "meta_description",
+        "content",
+      ];
+      const elements = inputIds
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+
+      elements.forEach((el) => {
+        el?.addEventListener("input", updateSeoPreview);
+      });
+
+      updateSeoPreview();
+
+      return () => {
+        elements.forEach((el) => {
+          el?.removeEventListener("input", updateSeoPreview);
+        });
+      };
+    }
+  }, [action]);
 
   useEffect(() => {
     if (!isEditing) {
       const titleInput = document.getElementById("title") as HTMLInputElement;
-      const slugInput = document.getElementById("slug") as HTMLInputElement;
 
-      if (titleInput && slugInput) {
-        const handleTitleChange = () => {
-          slugInput.value = generateSlug(titleInput.value);
-        };
-
+      if (titleInput) {
         titleInput.addEventListener("input", handleTitleChange);
         return () => titleInput.removeEventListener("input", handleTitleChange);
       }
@@ -422,7 +588,7 @@ const PostsAdminClient = ({
   // Render specific components
   if (action === "imageUpload") {
     return (
-      <ImageUpload
+      <ImageUploadComponent
         imagePreview={imagePreview}
         onImageChange={handleImageChange}
         onImageRemove={handleImageRemove}
@@ -432,7 +598,7 @@ const PostsAdminClient = ({
 
   if (action === "tags") {
     return (
-      <TagsManager
+      <TagsManagerComponent
         tags={formData.tags}
         tagInput={tagInput}
         onTagInputChange={setTagInput}

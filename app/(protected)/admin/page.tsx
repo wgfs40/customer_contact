@@ -1,5 +1,6 @@
 import AnalyticsAdmin from "@/components/admin/analytics/AnalyticsAdmin";
 import BlogManagement from "@/components/admin/blog/blog-management";
+import PostsAdmin from "@/components/admin/blog/posts-admin";
 import DashboardAdmin from "@/components/admin/dashboard/DashboardAdmin";
 import HeaderAdmin from "@/components/admin/dashboard/HeaderAdmin";
 import NavigationTabsAdmin from "@/components/admin/NavigationTabs/NavigationTabsAdmin";
@@ -10,8 +11,11 @@ import { Project } from "@/types/admin/Project";
 import { Stat } from "@/types/admin/Stat";
 import { User } from "@/types/admin/User";
 
-const AdminPage = ({ searchParams }: { searchParams: { tab: string } }) => {
-  const tab = searchParams?.tab || "dashboard";
+const AdminPage = async ({ searchParams }: { searchParams: Promise<{ tab: string }>}) => {
+
+  const params = await searchParams;
+
+  const tab = params?.tab || "dashboard";
   // Datos de ejemplo para stats
   const stats: Stat[] = [
     {
@@ -169,6 +173,13 @@ const AdminPage = ({ searchParams }: { searchParams: { tab: string } }) => {
           {tab === "settings" && (
             <div className="space-y-6">
               <SettingsAdmin />
+            </div>
+          )}
+
+          {/* Post Tab */}
+          {tab === "posts" && (
+            <div className="space-y-6">
+              <PostsAdmin />
             </div>
           )}
         </div>

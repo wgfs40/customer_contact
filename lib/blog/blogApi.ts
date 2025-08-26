@@ -638,7 +638,7 @@ export const updateBlogPost = async (
   id: string,
   updateData: UpdateBlogPostData
 ): Promise<ApiResponse<BlogPost>> => {
-  try {
+  try {    
     if (!id) {
       return {
         success: false,

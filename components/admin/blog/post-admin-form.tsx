@@ -10,16 +10,16 @@ interface Category {
 }
 
 interface BlogPost {
+  id?: string;
   title?: string;
   slug?: string;
   excerpt?: string;
   content?: string;
   meta_title?: string;
   meta_description?: string;
-  status?: "draft" | "published" | "archived";
   featured?: boolean;
   category_id?: string;
-  featured_image?: string;
+  image_url?: string;
   tags?: string[];
 }
 
@@ -35,6 +35,9 @@ export const PostsAdminForm = ({
   return (
     <form className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Main Content */}
+      {existingPost && existingPost.id && (
+        <input type="hidden" name="id" value={existingPost.id} />
+      )}
       <div className="lg:col-span-2 space-y-8">
         <BasicInfoSection existingPost={existingPost} />
         <ContentEditorSection existingPost={existingPost} />

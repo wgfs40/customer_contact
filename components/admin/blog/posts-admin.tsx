@@ -1,4 +1,7 @@
-import { getAllCategoriesAction, getBlogPostByIdAction } from "@/actions/blog_actions";
+import {
+  getAllCategoriesAction,
+  getBlogPostByIdAction,
+} from "@/actions/blog_actions";
 import PostsAdminClient from "./post-admin-client";
 import { PostsAdminHeader } from "./post-admin-header";
 import { PostsAdminForm } from "./post-admin-form";
@@ -24,10 +27,8 @@ interface BlogPost {
 }
 
 interface PostsAdminProps {
-  searchParams?: Promise<{
-    edit?: string;
-    id?: string;
-  }>;
+  edit?: string;
+  id?: string;
 }
 
 // Data fetching functions
@@ -44,24 +45,22 @@ async function getCategories(): Promise<Category[]> {
 async function getExistingPost(id: string): Promise<BlogPost | null> {
   try {
     // TODO: Implement getBlogPostByIdAction
-     const postResult = await getBlogPostByIdAction(id);
-     return postResult?.data as BlogPost;   
+    console.log("Fetching post with ID:", id);
+    const postResult = await getBlogPostByIdAction(id);
+    return postResult?.data as BlogPost;
   } catch (error) {
     console.error("Error fetching post:", error);
     return null;
   }
 }
 
-const PostsAdmin = async ({ searchParams }: PostsAdminProps) => {
-  const params = await searchParams;
-  const isEditing = Boolean(params?.edit && params?.id);
-
+const PostsAdmin = async ({ edit, id }: PostsAdminProps) => {
+  const isEditing = Boolean(edit && id);
+ 
   // Fetch data in parallel
   const [categories, existingPost] = await Promise.all([
     getCategories(),
-    isEditing && params?.id
-      ? getExistingPost(params.id)
-      : Promise.resolve(null),
+    isEditing && id ? getExistingPost(id) : Promise.resolve(null),
   ]);
 
   return (
@@ -75,7 +74,7 @@ const PostsAdmin = async ({ searchParams }: PostsAdminProps) => {
             existingPost
               ? {
                   ...existingPost,
-                  featured_image: undefined, // Ensure compatibility with expected type
+                  image_url: undefined, // Ensure compatibility with expected type
                 }
               : null
           }

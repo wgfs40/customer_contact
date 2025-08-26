@@ -85,7 +85,6 @@ export interface CreateBlogPostData {
   content: string;
   excerpt?: string;
   slug?: string; // Si no se proporciona, se genera automáticamente
-  status?: BlogPostStatus;
   image_url?: string;
   meta_title?: string;
   meta_description?: string;
@@ -101,7 +100,6 @@ export interface UpdateBlogPostData {
   content?: string;
   excerpt?: string;
   slug?: string;
-  status?: BlogPostStatus;
   image_url?: string;
   meta_title?: string;
   meta_description?: string;

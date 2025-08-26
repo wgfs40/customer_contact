@@ -230,6 +230,7 @@ export async function updateBlogPostAction(
       };
     }
 
+    console.log(updateData);
     // Validaciones básicas
     if (updateData.title !== undefined && !updateData.title?.trim()) {
       return {

@@ -3,7 +3,11 @@
 import { useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { createBlogPostAction } from "@/actions/blog_actions";
+import {
+  createBlogPostAction,
+  updateBlogPostAction,
+} from "@/actions/blog_actions";
+import Swal from "sweetalert2";
 
 // Types
 interface FormData {
@@ -12,12 +16,10 @@ interface FormData {
   excerpt: string;
   content: string;
   category_id: string;
-  status: "draft" | "published" | "archived";
   featured: boolean;
-  featured_image: File | null;
+  image_url: File | null;
   meta_title: string;
-  meta_description: string;
-  tags: string[];
+  meta_description: string;  
 }
 
 type FormatType =
@@ -44,7 +46,7 @@ interface PostsAdminClientProps {
   action?: ActionType;
   data?: { type?: FormatType };
   categories?: Array<{ id: string; name: string }>;
-  existingPost?: Partial<FormData & { featured_image?: string }> | null;
+  existingPost?: Partial<FormData & { image_url?: string; id?: string }> | null;
   isEditing?: boolean;
 }
 
@@ -193,7 +195,7 @@ const ImageUploadComponent = ({
             accept="image/jpeg,image/png,image/webp"
             onChange={onImageChange}
             className="hidden"
-            name="featured_image"
+            name="image_url"
           />
         </label>
       )}
@@ -208,7 +210,7 @@ const TagsManagerComponent = ({
   onAddTag,
   onRemoveTag,
 }: {
-  tags: string[];
+  tags?: string[];
   tagInput: string;
   onTagInputChange: (value: string) => void;
   onAddTag: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -230,16 +232,7 @@ const TagsManagerComponent = ({
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F9A825]/50 focus:border-[#F9A825] transition-colors"
         maxLength={30}
       />
-
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <Tag key={`${tag}-${index}`} tag={tag} onRemove={onRemoveTag} />
-          ))}
-        </div>
-      )}
-
-      <p className="text-xs text-gray-500">{tags.length}/10 etiquetas</p>
+     
     </div>
   </div>
 );
@@ -261,19 +254,15 @@ const PostsAdminClient = ({
     excerpt: existingPost?.excerpt || "",
     content: existingPost?.content || "",
     category_id: existingPost?.category_id || "",
-    status: existingPost?.status || "draft",
     featured: existingPost?.featured || false,
-    featured_image: null,
+    image_url: null,
     meta_title: existingPost?.meta_title || "",
-    meta_description: existingPost?.meta_description || "",
-    tags: existingPost?.tags || [],
+    meta_description: existingPost?.meta_description || "",    
   }));
 
   const [tagInput, setTagInput] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(
-    typeof existingPost?.featured_image === "string"
-      ? existingPost.featured_image
-      : null
+    typeof existingPost?.image_url === "string" ? existingPost.image_url : null
   );
   const [isLoading, setIsLoading] = useState(false);
 
@@ -408,7 +397,7 @@ const PostsAdminClient = ({
     }
   };
 
-  const handleSave = async (status: FormData["status"]) => {
+  const handleSave = async () => {
     if (isLoading) return;
 
     setIsLoading(true);
@@ -416,29 +405,35 @@ const PostsAdminClient = ({
       const formElement = document.querySelector("form") as HTMLFormElement;
       if (!formElement) throw new Error("Formulario no encontrado");
 
-      const formDataToSend = new FormData(formElement);
-      formDataToSend.set("status", status);
-      formDataToSend.set("tags", JSON.stringify(formData.tags));
+      const formDataToSend = new FormData(formElement);   
 
       console.log("Guardando post:", {
-        status,
         data: Object.fromEntries(formDataToSend),
       });
 
-      
-      const result = await createBlogPostAction(
-        Object.fromEntries(formDataToSend) as any
-      );
+      let result;
+      //validar si es una actualizacion de datos
+      if (isEditing) {
+        const updateData = Object.fromEntries(formDataToSend) as any;
+        result = await updateBlogPostAction(updateData?.id || "", updateData);
+        console.log("Resultado de la edición del post:", result);
+      } else {
+        result = await createBlogPostAction(
+          Object.fromEntries(formDataToSend) as any
+        );
+      }
+
       console.log("Resultado de la creación del post:", result);
 
       if (result.success) {
-        
-        alert(
-          `¡Post ${
-            status === "published" ? "publicado" : "guardado"
-          } exitosamente!`
-        );
-        if (status === "published") {
+        Swal.fire({
+          title: "Éxito!",
+          text: `¡Post guardado exitosamente!`,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+
+        if (result.success) {
           router.push("/admin?tab=posts");
         }
       } else {
@@ -447,7 +442,12 @@ const PostsAdminClient = ({
       }
     } catch (error) {
       console.error("Error al guardar:", error);
-      alert("Error al guardar el post");
+      Swal.fire({
+        title: "Error",
+        text: "Error al guardar el post",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -486,18 +486,12 @@ const PostsAdminClient = ({
       e.preventDefault();
       const newTag = tagInput.trim().toLowerCase();
 
-      if (!formData.tags.includes(newTag) && formData.tags.length < 10) {
-        setFormData((prev) => ({ ...prev, tags: [...prev.tags, newTag] }));
-        setTagInput("");
-      }
+      
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
-    }));
+   
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -509,7 +503,7 @@ const PostsAdminClient = ({
       return;
     }
 
-    setFormData((prev) => ({ ...prev, featured_image: file }));
+    setFormData((prev) => ({ ...prev, image_url: file }));
 
     const reader = createFileReader((result) => setImagePreview(result));
     reader.readAsDataURL(file);
@@ -517,7 +511,7 @@ const PostsAdminClient = ({
 
   const handleImageRemove = () => {
     setImagePreview(null);
-    setFormData((prev) => ({ ...prev, featured_image: null }));
+    setFormData((prev) => ({ ...prev, image_url: null }));
 
     const fileInput = document.querySelector(
       'input[type="file"]'
@@ -598,8 +592,7 @@ const PostsAdminClient = ({
 
   if (action === "tags") {
     return (
-      <TagsManagerComponent
-        tags={formData.tags}
+      <TagsManagerComponent        
         tagInput={tagInput}
         onTagInputChange={setTagInput}
         onAddTag={handleAddTag}

@@ -78,7 +78,7 @@ export const PostsAdminHeader = ({ isEditing }: PostsAdminHeaderProps) => {
             </button>
           </PostsAdminClient>
 
-          <PostsAdminClient action="publish">
+          <PostsAdminClient action="publish" isEditing={isEditing}>
             <button className="inline-flex items-center gap-2 bg-gradient-to-r from-[#F9A825] to-[#FF8F00] text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300 hover:scale-105">
               <svg
                 className="w-5 h-5"

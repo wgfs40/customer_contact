@@ -6,9 +6,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface BlogManagementClientProps {
   children: React.ReactNode;
   tab?: string;
+  edit?: boolean;
+  id?: string;
 }
 
-const BlogManagementClient = ({ children, tab }: BlogManagementClientProps) => {
+const BlogManagementClient = ({ children, tab, edit, id }: BlogManagementClientProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -16,6 +18,12 @@ const BlogManagementClient = ({ children, tab }: BlogManagementClientProps) => {
     if (tab) {
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", tab);
+      if (edit) {
+        params.set("edit", String(edit));
+      }
+      if (id) {
+        params.set("id", id);
+      }
       router.push(`?${params.toString()}`);
     }
   };

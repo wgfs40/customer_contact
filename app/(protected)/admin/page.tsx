@@ -11,11 +11,18 @@ import { Project } from "@/types/admin/Project";
 import { Stat } from "@/types/admin/Stat";
 import { User } from "@/types/admin/User";
 
-const AdminPage = async ({ searchParams }: { searchParams: Promise<{ tab: string }>}) => {
-
+const AdminPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab: string; edit?: boolean; id?: string }>;
+}) => {
   const params = await searchParams;
 
   const tab = params?.tab || "dashboard";
+
+  const isEditing = params?.edit || false;
+  const userId = params?.id || "";
+
   // Datos de ejemplo para stats
   const stats: Stat[] = [
     {
@@ -179,7 +186,7 @@ const AdminPage = async ({ searchParams }: { searchParams: Promise<{ tab: string
           {/* Post Tab */}
           {tab === "posts" && (
             <div className="space-y-6">
-              <PostsAdmin />
+              <PostsAdmin edit={String(isEditing)} id={userId} />
             </div>
           )}
         </div>

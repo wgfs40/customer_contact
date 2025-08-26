@@ -594,7 +594,11 @@ const BlogManagement = async ({ searchParams }: BlogManagementProps) => {
                               </div>
 
                               {/* Acciones */}
-                              <BlogManagementClient>
+                              <BlogManagementClient
+                                tab="posts"
+                                edit={true}
+                                id={post.id}
+                              >
                                 <div className="flex items-center gap-2">
                                   <button
                                     title="Editar artículo"

@@ -6,7 +6,6 @@ interface Category {
 }
 
 interface BlogPost {
-  status?: "draft" | "published" | "archived";
   featured?: boolean;
   category_id?: string;
 }
@@ -34,25 +33,6 @@ export const SidebarSections = ({
         </div>
 
         <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="status"
-              className="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Estado
-            </label>
-            <select
-              id="status"
-              name="status"
-              defaultValue={existingPost?.status || "draft"}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F9A825]/50 focus:border-[#F9A825] transition-colors"
-            >
-              <option value="draft">📝 Borrador</option>
-              <option value="published">✅ Publicado</option>
-              <option value="archived">📦 Archivado</option>
-            </select>
-          </div>
-
           <div className="flex items-center">
             <input
               type="checkbox"

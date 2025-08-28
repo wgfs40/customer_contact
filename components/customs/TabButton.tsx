@@ -1,14 +1,26 @@
 "use client";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 interface TabButtonProps {
   id: string;
   label: string;
   icon?: React.ReactNode;
   activeTab: string;
-  onClick: (id: string) => void;
 }
-const TabButton = ({ id, label, icon, activeTab, onClick }: TabButtonProps) => {
+const TabButton = ({ id, label, icon, activeTab }: TabButtonProps) => {
+  const params = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
   const setActiveTab = (id: string) => {
-    onClick(id);
+    if (params.get("tab") === id) return;
+
+    const newParams = new URLSearchParams(params.toString());
+    newParams.set("tab", id);
+
+    const newUrl = `${pathname}?${newParams.toString()}`;
+    router.push(newUrl);
   };
 
   return (

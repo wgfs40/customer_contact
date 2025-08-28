@@ -1,15 +1,14 @@
 "use client";
 
+import { getStatusColor } from "@/lib/admin/status-color";
 import { Project } from "@/types/admin/Project";
 
 interface ProjectsAdminProps {
-  projects?: Project[];
-  getStatusColor: (status: string) => string;
+  projects?: Project[];  
 }
 
 const ProjectsAdmin = ({
-  projects = [],
-  getStatusColor,
+  projects = [],  
 }: ProjectsAdminProps) => {
   // Filtro para mostrar solo proyectos activos
   const projectsToShow = projects.filter(

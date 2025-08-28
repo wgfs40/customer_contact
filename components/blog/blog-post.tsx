@@ -150,9 +150,9 @@ const BlogPost = async ({
               >
                 {/* Imagen destacada */}
                 <div className="relative overflow-hidden bg-gradient-to-br from-[#F9A825]/10 to-[#FF8F00]/10 h-48 sm:h-56">
-                  {post.featured_image ? (
+                  {post.image_url ? (
                     <Image
-                      src={post.featured_image}
+                      src={post.image_url}
                       alt={post.title}
                       width={500}
                       height={300}
@@ -319,9 +319,9 @@ const BlogPost = async ({
               <div className="flex flex-col sm:flex-row">
                 {/* Imagen del post */}
                 <div className="sm:w-1/3 relative overflow-hidden bg-gradient-to-br from-[#F9A825]/10 to-[#FF8F00]/10 h-48 sm:h-auto min-h-[200px]">
-                  {post.featured_image ? (
+                  {post.image_url ? (
                     <Image
-                      src={post.featured_image}
+                      src={post.image_url}
                       alt={post.title}
                       width={400}
                       height={250}

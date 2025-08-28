@@ -129,7 +129,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
           <div className="flex items-center ml-6 space-x-3">
             <SignedIn>
               <Link
-                href="/customer"
+                href="/admin"
                 className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#F57C00] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
               >
                 Panel de Cliente
@@ -288,7 +288,7 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
             <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-gray-50/50">
               <SignedIn>
                 <Link
-                  href="/customer"
+                  href="/admin"
                   onClick={() => setMenuOpen(false)}
                   className="block w-full bg-gradient-to-r from-[#F9A825] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#F57C00] text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 shadow-md text-center mb-4"
                 >

@@ -1,6 +1,6 @@
-"use client";
-
 import AnalyticsAdmin from "@/components/admin/analytics/AnalyticsAdmin";
+import BlogManagement from "@/components/admin/blog/blog-management";
+import PostsAdmin from "@/components/admin/blog/posts-admin";
 import DashboardAdmin from "@/components/admin/dashboard/DashboardAdmin";
 import HeaderAdmin from "@/components/admin/dashboard/HeaderAdmin";
 import NavigationTabsAdmin from "@/components/admin/NavigationTabs/NavigationTabsAdmin";
@@ -10,10 +10,18 @@ import UsersManagement from "@/components/admin/user/UsersManagement ";
 import { Project } from "@/types/admin/Project";
 import { Stat } from "@/types/admin/Stat";
 import { User } from "@/types/admin/User";
-import { useState } from "react";
 
-const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+const AdminPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab: string; edit?: boolean; id?: string }>;
+}) => {
+  const params = await searchParams;
+
+  const tab = params?.tab || "dashboard";
+
+  const isEditing = params?.edit || false;
+  const userId = params?.id || "";
 
   // Datos de ejemplo para stats
   const stats: Stat[] = [
@@ -83,21 +91,6 @@ const AdminPage = () => {
     },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "inactive":
-        return "bg-red-100 text-red-800";
-      case "completed":
-        return "bg-blue-100 text-blue-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   // Datos de ejemplo para proyectos
   const projects: Project[] = [
     {
@@ -144,48 +137,56 @@ const AdminPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Navigation Tabs */}
-        <NavigationTabsAdmin
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
+        <NavigationTabsAdmin activeTab={tab} />
 
         {/* Tab Content */}
         <div className="mt-8">
           {/* Dashboard Content */}
-          {activeTab === "dashboard" && (
+          {tab === "dashboard" && (
             <div className="space-y-8">
               <DashboardAdmin stats={stats} />
             </div>
           )}
 
           {/* Users Management */}
-          {activeTab === "users" && (
+          {tab === "users" && (
             <div className="space-y-6">
-              <UsersManagement users={users} getStatusColor={getStatusColor} />
+              <UsersManagement users={users} />
+            </div>
+          )}
+
+          {/* Blog Management */}
+          {tab === "blog" && (
+            <div className="space-y-6">
+              <BlogManagement />
             </div>
           )}
 
           {/* Projects Management */}
-          {activeTab === "projects" && (
+          {tab === "projects" && (
             <div className="space-y-6">
-              <ProjectsAdmin
-                projects={projects}
-                getStatusColor={getStatusColor}
-              />
+              <ProjectsAdmin projects={projects} />
             </div>
           )}
 
           {/* Analytics Tab */}
-          {activeTab === "analytics" && (
+          {tab === "analytics" && (
             <div className="space-y-6">
               <AnalyticsAdmin />
             </div>
           )}
 
           {/* Settings Tab */}
-          {activeTab === "settings" && (
+          {tab === "settings" && (
             <div className="space-y-6">
               <SettingsAdmin />
+            </div>
+          )}
+
+          {/* Post Tab */}
+          {tab === "posts" && (
+            <div className="space-y-6">
+              <PostsAdmin edit={String(isEditing)} id={userId} />
             </div>
           )}
         </div>

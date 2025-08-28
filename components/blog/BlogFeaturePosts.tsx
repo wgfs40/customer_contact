@@ -51,9 +51,9 @@ const BlogFeaturePosts: React.FC<BlogFeaturePostsProps> = ({
           onClick={() => openPost(post)}
         >
           <div className="relative h-48 overflow-hidden">
-            {post.featured_image ? (
+            {post.image_url ? (
               <Image
-                src={post.featured_image}
+                src={post.image_url}
                 alt={post.title}
                 fill
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

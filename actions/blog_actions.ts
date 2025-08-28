@@ -346,7 +346,6 @@ export async function publishBlogPostAction(
     console.log("[publishBlogPostAction] Publicando post:", id);
 
     const updateData: UpdateBlogPostData = {
-      status: "published",
       published_date: new Date().toISOString(),
     };
 

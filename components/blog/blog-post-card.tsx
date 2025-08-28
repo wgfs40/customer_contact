@@ -53,8 +53,6 @@ const BlogPostCard = ({
     );
   };
 
-  
-
   // Variante Horizontal (nueva variante con imagen izquierda)
   if (variant === "horizontal") {
     return (
@@ -63,9 +61,9 @@ const BlogPostCard = ({
           <div className="flex flex-col md:flex-row">
             {/* Imagen izquierda */}
             <div className="relative md:w-80 h-48 md:h-64 flex-shrink-0 overflow-hidden">
-              {isValidImageUrl(post.featured_image) ? (
+              {isValidImageUrl(post.image_url) ? (
                 <Image
-                  src={post.featured_image!}
+                  src={post.image_url!}
                   alt={post.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -218,9 +216,9 @@ const BlogPostCard = ({
           <div className="flex flex-col lg:flex-row">
             {/* Imagen izquierda */}
             <div className="relative lg:w-96 h-64 lg:h-80 overflow-hidden">
-              {isValidImageUrl(post.featured_image) ? (
+              {isValidImageUrl(post.image_url) ? (
                 <Image
-                  src={post.featured_image!}
+                  src={post.image_url!}
                   alt={post.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -316,9 +314,9 @@ const BlogPostCard = ({
           <div className="flex">
             {/* Imagen lateral */}
             <div className="relative w-32 h-24 flex-shrink-0 overflow-hidden">
-              {isValidImageUrl(post.featured_image) ? (
+              {isValidImageUrl(post.image_url) ? (
                 <Image
-                  src={post.featured_image!}
+                  src={post.image_url!}
                   alt={post.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -370,9 +368,9 @@ const BlogPostCard = ({
       <Link href={`/blog/${getPostSlug()}`} className="block">
         {/* Imagen principal */}
         <div className="relative h-48 overflow-hidden">
-          {isValidImageUrl(post.featured_image) ? (
+          {isValidImageUrl(post.image_url) ? (
             <Image
-              src={post.featured_image!}
+              src={post.image_url!}
               alt={post.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"

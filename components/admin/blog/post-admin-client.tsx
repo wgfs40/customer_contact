@@ -19,7 +19,7 @@ interface FormData {
   featured: boolean;
   image_url: File | null;
   meta_title: string;
-  meta_description: string;  
+  meta_description: string;
 }
 
 type FormatType =
@@ -232,7 +232,6 @@ const TagsManagerComponent = ({
         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#F9A825]/50 focus:border-[#F9A825] transition-colors"
         maxLength={30}
       />
-     
     </div>
   </div>
 );
@@ -257,7 +256,7 @@ const PostsAdminClient = ({
     featured: existingPost?.featured || false,
     image_url: null,
     meta_title: existingPost?.meta_title || "",
-    meta_description: existingPost?.meta_description || "",    
+    meta_description: existingPost?.meta_description || "",
   }));
 
   const [tagInput, setTagInput] = useState("");
@@ -405,7 +404,7 @@ const PostsAdminClient = ({
       const formElement = document.querySelector("form") as HTMLFormElement;
       if (!formElement) throw new Error("Formulario no encontrado");
 
-      const formDataToSend = new FormData(formElement);   
+      const formDataToSend = new FormData(formElement);
 
       console.log("Guardando post:", {
         data: Object.fromEntries(formDataToSend),
@@ -470,8 +469,6 @@ const PostsAdminClient = ({
 
     const actionHandlers = {
       goBack: () => router.back(),
-      saveDraft: () => handleSave("draft"),
-      publish: () => handleSave("published"),
       format: () => data?.type && handleFormat(data.type),
     };
 
@@ -485,14 +482,10 @@ const PostsAdminClient = ({
     if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
       const newTag = tagInput.trim().toLowerCase();
-
-      
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
-   
-  };
+  const handleRemoveTag = (tagToRemove: string) => {};
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -592,7 +585,7 @@ const PostsAdminClient = ({
 
   if (action === "tags") {
     return (
-      <TagsManagerComponent        
+      <TagsManagerComponent
         tagInput={tagInput}
         onTagInputChange={setTagInput}
         onAddTag={handleAddTag}

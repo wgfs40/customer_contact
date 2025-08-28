@@ -73,15 +73,14 @@ export async function POST(request: NextRequest) {
       title: body.title,
       content: body.content,
       excerpt: body.excerpt || blogApi.generateExcerpt(body.content),
-      slug: body.slug,
-      status: body.status || "draft",
+      slug: body.slug,     
       category_id: body.category_id,
       author_id: body.author_id,
-      featured_image: body.featured_image,
+      author_name: body.author_name, // Add this line to fix the error
+      image_url: body.featured_image,
       meta_title: body.meta_title,
       meta_description: body.meta_description,
       featured: body.is_featured || false,
-      allow_comments: body.allow_comments !== false,
       tags: body.tags || [],
     };
 

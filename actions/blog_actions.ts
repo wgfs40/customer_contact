@@ -376,7 +376,6 @@ export async function unpublishBlogPostAction(
     console.log("[unpublishBlogPostAction] Despublicando post:", id);
 
     const updateData: UpdateBlogPostData = {
-      status: "draft",
       published_date: null,
     };
 

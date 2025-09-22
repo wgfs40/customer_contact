@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import NavItem from "./nav-item";
 
 interface HeaderProps {
   menuOpen: boolean;
@@ -100,29 +101,17 @@ const Header = ({ menuOpen, setMenuOpen }: HeaderProps) => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-1">
           {navItems.map((item) => (
-            <Link
+            <NavItem
               key={item.href}
               href={item.href}
-              onClick={() => setActiveLink(item.href)}
+              label={item.label}
+              icon={item.icon}
               className={`relative px-4 py-2 rounded-lg font-medium transition-all duration-300 group ${
                 activeLink === item.href
                   ? "text-[#F9A825] bg-[#F9A825]/10"
                   : "text-gray-700 hover:text-[#F9A825] hover:bg-gray-50"
               }`}
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <span className="text-sm">{item.icon}</span>
-                {item.label}
-              </span>
-
-              {/* Active indicator */}
-              {activeLink === item.href && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-[#F9A825] to-[#FF8F00] rounded-full"></div>
-              )}
-
-              {/* Hover effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#F9A825]/5 to-[#FF8F00]/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </Link>
+            />
           ))}
 
           {/* Auth Section */}

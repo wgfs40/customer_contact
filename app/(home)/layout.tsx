@@ -11,11 +11,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex gap-[2%] flex-wrap content-start p-2">
       {/* Header */}
       <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       {/* Main content area */}
-      <main className="flex-1 container mx-auto px-4 mt-50">
+      <main className="grow h-3/4">
         <CookieBanner />
         {children}
       </main>

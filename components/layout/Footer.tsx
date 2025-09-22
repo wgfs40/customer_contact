@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <div className="bg-gray-800 text-white py-4">
+    <div className="w-full h-[5%]">
       <p className="text-center text-sm">
         © 2023 Dosis de Marketing. Todos los derechos reservados.
       </p>

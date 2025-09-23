@@ -60,42 +60,48 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <HeaderMenuItems
-                key={item.href}
-                item={item}
-                pathname={pathname}
-              />
-            ))}
-            <div className="flex items-center ml-6 space-x-3">
-              <SignedIn>
-                <Link
-                  href="/admin"
-                  className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#F57C00] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  Panel de Cliente
-                </Link>
-                <div className="border-l border-gray-200 pl-3">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox:
-                          "w-9 h-9 ring-2 ring-[#F9A825]/20 hover:ring-[#F9A825]/40 transition-all duration-300",
-                      },
-                    }}
+          <div className="flex items-center space-x-4">
+            <nav>
+              <ul className="flex space-x-4 items-center">
+                {navItems.map((item) => (
+                  <HeaderMenuItems
+                    key={item.href}
+                    item={item}
+                    pathname={pathname}
                   />
-                </div>
-              </SignedIn>
-              <SignedOut>
-                <SignInButton>
-                  <button className="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition duration-300">
-                    Iniciar Sesión
-                  </button>
-                </SignInButton>
-              </SignedOut>
-            </div>
-          </nav>
+                ))}
+                <li>
+                  <div className="flex items-center ml-6 space-x-3">
+                    <SignedIn>
+                      <Link
+                        href="/admin"
+                        className="bg-gradient-to-r from-[#F9A825] to-[#FF8F00] hover:from-[#FF8F00] hover:to-[#F57C00] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                      >
+                        Panel de Cliente
+                      </Link>
+                      <div className="border-l border-gray-200 pl-3">
+                        <UserButton
+                          appearance={{
+                            elements: {
+                              avatarBox:
+                                "w-9 h-9 ring-2 ring-[#F9A825]/20 hover:ring-[#F9A825]/40 transition-all duration-300",
+                            },
+                          }}
+                        />
+                      </div>
+                    </SignedIn>
+                    <SignedOut>
+                      <SignInButton>
+                        <button className="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition duration-300">
+                          Iniciar Sesión
+                        </button>
+                      </SignInButton>
+                    </SignedOut>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </header>
     </>

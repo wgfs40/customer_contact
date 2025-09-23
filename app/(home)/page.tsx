@@ -1,5 +1,6 @@
 "use client";
 
+import FeaturedServices from "@/components/layout/featured-services";
 import Hero from "@/components/layout/Hero";
 import Head from "next/head";
 <Head>
@@ -25,6 +26,7 @@ const page = () => {
       {" "}
       {/* Hero section */}
       <Hero />
+      <FeaturedServices />
     </div>
   );
 };
